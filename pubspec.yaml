@@ -48,6 +48,9 @@ dependencies:
   awesome_bottom_bar: ^1.2.1
   url_launcher: ^6.1.6
   flutter_barcode_scanner: ^2.0.0
+  barcode_scan2: ^4.2.1
+  simple_barcode_scanner: ^0.0.5
+  flutter_zxing: ^0.8.4
   fluttertoast: ^8.1.1
   http: ^0.13.5
   shared_preferences: ^2.0.15

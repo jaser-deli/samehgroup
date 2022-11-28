@@ -1,8 +1,15 @@
 import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
+
+// import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:samehgroup/screens/barcode_scanner_screen.dart';
+import 'package:simple_barcode_scanner/enum.dart';
+
+// import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
+
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
@@ -52,18 +59,62 @@ class _DestroyScreenState extends State<DestroyScreen> {
     theme = AppTheme.theme;
   }
 
+  // Future<void> scanBarcode(BuildContext context) async {
+  //   String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+  //       "#ff6666", 'back'.tr(), true, ScanMode.BARCODE);
+  //
+  //   if (!mounted) return;
+  //
+  //   setState(() {
+  //     if (barcodeScanRes != "-1") {
+  //       // set Data
+  //       _barcodeController.text = barcodeScanRes;
+  //     }
+  //   });
+  // }
+
+  // Future<void> scanBarcode(BuildContext context) async {
+  //   var options = ScanOptions(
+  //     restrictFormat: [BarcodeFormat.upce, BarcodeFormat.code128],
+  //   );
+  //
+  //   ScanResult result = await BarcodeScanner.scan(options: options);
+  //
+  //   print(result.format.toString());
+  // }
+
+  // Future<void> scanBarcode(BuildContext context) async {
+  //   String result = "";
+  //   var res = await Navigator.push(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (context) => const SimpleBarcodeScannerPage(
+  //           scanType: ScanType.BARCODE,
+  //         ),
+  //       ));
+  //   setState(() {
+  //     if (res is String) {
+  //       result = res;
+  //     }
+  //   });
+  //
+  //   print(result);
+  // }
+
   Future<void> scanBarcode(BuildContext context) async {
-    String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666", 'back'.tr(), true, ScanMode.BARCODE);
-
-    if (!mounted) return;
-
+    String result = "";
+    var res = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BarcodeScannerScreen(),
+        ));
     setState(() {
-      if (barcodeScanRes != "-1") {
-        // set Data
-        _barcodeController.text = barcodeScanRes;
+      if (res is String) {
+        result = res;
       }
     });
+
+    print(result);
   }
 
   Future<void> getItem() async {
@@ -255,13 +306,12 @@ class _DestroyScreenState extends State<DestroyScreen> {
                 keyboardType: TextInputType.phone,
                 textInputAction: TextInputAction.done,
                 onSubmitted: (value) {
-                    validation(
-                        _quantityReservedController.text,
-                        _quantityDestroyController.text,
-                        quantityDestroy,
-                        't_i_is_p_a_p_a_or_c_t_t',
-                        't_d_q_is_g_t_t_c_q');
-
+                  validation(
+                      _quantityReservedController.text,
+                      _quantityDestroyController.text,
+                      quantityDestroy,
+                      't_i_is_p_a_p_a_or_c_t_t',
+                      't_d_q_is_g_t_t_c_q');
                 },
                 maxLines: 1,
                 onTap: () {
@@ -506,27 +556,26 @@ class _DestroyScreenState extends State<DestroyScreen> {
 
   void validation(String greater, String lesser, String destroy, String alertIf,
       String alertElseIf) {
-
-    if(_barcodeController.text.isNotEmpty){
+    if (_barcodeController.text.isNotEmpty) {
       if (int.parse(greater) > 0) {
         AwesomeDialog(
-            context: context,
-            dialogType: DialogType.error,
-            animType: AnimType.BOTTOMSLIDE,
-            title: 'error'.tr(),
-            desc: alertIf.tr(),
-            btnOkText: 'ok'.tr(),
-            btnOkOnPress: () {})
+                context: context,
+                dialogType: DialogType.error,
+                animType: AnimType.BOTTOMSLIDE,
+                title: 'error'.tr(),
+                desc: alertIf.tr(),
+                btnOkText: 'ok'.tr(),
+                btnOkOnPress: () {})
             .show();
       } else if (int.parse(lesser) > int.parse(destroy)) {
         AwesomeDialog(
-            context: context,
-            dialogType: DialogType.error,
-            animType: AnimType.BOTTOMSLIDE,
-            title: 'error'.tr(),
-            desc: alertElseIf.tr(),
-            btnOkText: 'ok'.tr(),
-            btnOkOnPress: () {})
+                context: context,
+                dialogType: DialogType.error,
+                animType: AnimType.BOTTOMSLIDE,
+                title: 'error'.tr(),
+                desc: alertElseIf.tr(),
+                btnOkText: 'ok'.tr(),
+                btnOkOnPress: () {})
             .show();
       } else {
         // Insert Data
@@ -536,8 +585,8 @@ class _DestroyScreenState extends State<DestroyScreen> {
         //clear filed
         clearFiled();
       }
-    } else{
-      validationField( _barcodeController.text, 'p_e_barcode_no', getItem());
+    } else {
+      validationField(_barcodeController.text, 'p_e_barcode_no', getItem());
     }
   }
 

@@ -2,6 +2,8 @@
     package="com.samehgroup.samehgroup">
 
     <uses-permission android:name="android.permission.INTERNET" /> <!-- Add this -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
 
 
     <!-- Provide required visibility configuration for API level 30 and above -->

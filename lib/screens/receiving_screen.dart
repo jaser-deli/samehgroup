@@ -620,7 +620,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                       });
                     }
 
-                    // if (int.parse(_quantityReservedController.text) > 0) {
+                    // if (double.parse(_quantityReservedController.text) > 0) {
                     //   AwesomeDialog(
                     //       context: context,
                     //       dialogType: DialogType.error,
@@ -630,7 +630,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                     //       btnOkText: 'ok'.tr(),
                     //       btnOkOnPress: () {})
                     //       .show();
-                    // } else if (int.parse(_quantityDestroyController.text) >
+                    // } else if (double.parse(_quantityDestroyController.text) >
                     //     quantityDestroy) {
                     //   AwesomeDialog(
                     //       context: context,
@@ -670,7 +670,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
               FxButton.medium(
                   borderRadiusAll: 8,
                   onPressed: () {
-                    // if (int.parse(_quantityReservedController.text) > 0) {
+                    // if (double.parse(_quantityReservedController.text) > 0) {
                     //   AwesomeDialog(
                     //       context: context,
                     //       dialogType: DialogType.error,
@@ -680,7 +680,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                     //       btnOkText: 'ok'.tr(),
                     //       btnOkOnPress: () {})
                     //       .show();
-                    // } else if (int.parse(_quantityDestroyController.text) >
+                    // } else if (double.parse(_quantityDestroyController.text) >
                     //     quantityDestroy) {
                     //   AwesomeDialog(
                     //       context: context,

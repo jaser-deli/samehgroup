@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/extensions/string.dart';
+import 'package:samehgroup/screens/barcode_scanner_screen.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
@@ -21,38 +21,39 @@ class TransferFromBranch extends StatefulWidget {
 }
 
 class _TransferFromBranchState extends State<TransferFromBranch> {
+  // Theme
   late CustomTheme customTheme;
   late ThemeData theme;
 
+  // Text Editing
   late TextEditingController _barcodeController;
   late TextEditingController _quantityTransferController;
   late TextEditingController _quantityCurrentController;
   late TextEditingController _quantityReservedController;
 
+  // Lists
   List branches = [];
 
+  // information Data Set
   String _chosenValueBranchTo = "";
-
   String branchNo = "";
   String itemNo = "";
   String itemName = "";
   String itemEquivelentQty = "";
 
+  // read only Field
   bool readOnlyBarcode = true;
   bool readOnlyTransferQ = true;
   bool readOnlyCurrentQ = true;
 
   Future<void> scanBarcode(BuildContext context) async {
-    String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666", 'back'.tr(), true, ScanMode.BARCODE);
-
-    if (!mounted) return;
-
+    var res = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BarcodeScannerScreen(),
+        ));
     setState(() {
-      if (barcodeScanRes != "-1") {
-        // set Data
-        _barcodeController.text = barcodeScanRes;
-      }
+      _barcodeController.text = res;
     });
   }
 
@@ -87,7 +88,6 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
       setState(() {
-        // set Data
         _quantityCurrentController.text =
             responseBody["data"][0]["quantity_current"];
       });
@@ -103,7 +103,6 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
       setState(() {
-        // set Data
         _quantityReservedController.text =
             responseBody["data"][0]["quantity_reserved"];
       });
@@ -113,7 +112,6 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
   Future getItemBarcode() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
-    // get User Info
     Map<String, dynamic> userInfo =
         jsonDecode(preferences.getString(ConfigSharedPreferences.userInfo)!)
             as Map<String, dynamic>;
@@ -137,8 +135,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
           itemEquivelentQty = responseBody["data"]["itm_equivelent_qty"];
         });
       } else {
-        //clear filed
-        clearField(true);
+        clearField();
 
         AwesomeDialog(
                 context: context,
@@ -168,13 +165,13 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
 
-      if (responseBody["data"] != 1) {
+      if (responseBody["data"] == 1) {
         AwesomeDialog(
                 context: context,
                 dialogType: DialogType.success,
                 animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 'a_e_o'.tr(),
+                title: 'success'.tr(),
+                desc: 'o_a_s'.tr(),
                 btnOkText: 'ok'.tr(),
                 btnOkOnPress: () {})
             .show();
@@ -282,18 +279,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                           ? _chosenValueBranchTo
                           : null,
                       onTap: () {
-                        _barcodeController.clear();
-                        _quantityTransferController.clear();
-                        _quantityCurrentController.clear();
-                        _quantityReservedController.clear();
-
-                        setState(() {
-                          _chosenValueBranchTo = "";
-
-                          readOnlyBarcode = true;
-                          readOnlyTransferQ = true;
-                          readOnlyCurrentQ = true;
-                        });
+                        clearField();
                       },
                       decoration: new InputDecoration(
                           focusedBorder: OutlineInputBorder(
@@ -401,7 +387,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp("[0-9]")),
                 ],
               ),
               (readOnlyTransferQ)
@@ -534,7 +520,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
               FxSpacing.height(24),
@@ -575,7 +561,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
               FxSpacing.height(24),
@@ -616,7 +602,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
               FxSpacing.height(16),
@@ -626,50 +612,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                   FxButton.medium(
                       borderRadiusAll: 8,
                       onPressed: () {
-                        if (int.parse(_quantityReservedController.text) > 0) {
-                          AwesomeDialog(
-                                  context: context,
-                                  dialogType: DialogType.error,
-                                  animType: AnimType.BOTTOMSLIDE,
-                                  title: 'error'.tr(),
-                                  desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
-                                  btnOkText: 'ok'.tr(),
-                                  btnOkOnPress: () {})
-                              .show();
-                        } else if (int.parse(_quantityTransferController.text) >
-                            int.parse(_quantityCurrentController.text)) {
-                          AwesomeDialog(
-                                  context: context,
-                                  dialogType: DialogType.error,
-                                  animType: AnimType.BOTTOMSLIDE,
-                                  title: 'error'.tr(),
-                                  desc: 'الكمية المحولة اكبر من الكمية الحاليه'
-                                      .tr(),
-                                  btnOkText: 'ok'.tr(),
-                                  btnOkOnPress: () {})
-                              .show();
-                        } else {
-                          save(
-                              branchNo,
-                              _chosenValueBranchTo,
-                              itemNo,
-                              _barcodeController.text,
-                              itemEquivelentQty,
-                              _quantityTransferController.text);
-
-                          _barcodeController.clear();
-                          _quantityTransferController.clear();
-                          _quantityCurrentController.clear();
-                          _quantityReservedController.clear();
-
-                          setState(() {
-                            _chosenValueBranchTo = "";
-
-                            readOnlyBarcode = true;
-                            readOnlyTransferQ = true;
-                            readOnlyCurrentQ = true;
-                          });
-                        }
+                        validation();
                       },
                       backgroundColor: customTheme.Primary,
                       child: FxText.labelLarge(
@@ -701,7 +644,66 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
     );
   }
 
-  void clearField(bool flag) {
+  void validation() {
+    if (_barcodeController.text.isNotEmpty) {
+      if (double.parse(_quantityReservedController.text) > 0) {
+        AwesomeDialog(
+                context: context,
+                dialogType: DialogType.error,
+                animType: AnimType.BOTTOMSLIDE,
+                title: 'error'.tr(),
+                desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
+                btnOkText: 'ok'.tr(),
+                btnOkOnPress: () {})
+            .show();
+      } else if (double.parse(_quantityTransferController.text) >
+          double.parse(_quantityCurrentController.text)) {
+        AwesomeDialog(
+                context: context,
+                dialogType: DialogType.error,
+                animType: AnimType.BOTTOMSLIDE,
+                title: 'error'.tr(),
+                desc: 'الكمية المحولة اكبر من الكمية الحاليه'.tr(),
+                btnOkText: 'ok'.tr(),
+                btnOkOnPress: () {})
+            .show();
+      } else {
+        save(branchNo, _chosenValueBranchTo, itemNo, _barcodeController.text,
+            itemEquivelentQty, _quantityTransferController.text);
+
+        clearFieldCustom();
+      }
+    } else {
+      validationField(
+          _barcodeController.text, 'p_e_barcode_no', getItemBarcode());
+    }
+  }
+
+  void validationField(String text, String alert, Future future) async {
+    if (text.isEmpty) {
+      setState(() {
+        readOnlyBarcode = true;
+      });
+
+      AwesomeDialog(
+              context: context,
+              dialogType: DialogType.error,
+              animType: AnimType.BOTTOMSLIDE,
+              title: 'error'.tr(),
+              desc: alert.tr(),
+              btnOkText: 'ok'.tr(),
+              btnOkOnPress: () {})
+          .show();
+    } else {
+      setState(() {
+        readOnlyBarcode = false;
+      });
+
+      await future;
+    }
+  }
+
+  void clearField() {
     _barcodeController.clear();
     _quantityTransferController.clear();
     _quantityCurrentController.clear();
@@ -709,9 +711,22 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
 
     setState(() {
       _chosenValueBranchTo = "";
-      readOnlyBarcode = flag;
-      readOnlyTransferQ = flag;
-      readOnlyCurrentQ = flag;
+      readOnlyBarcode = true;
+      readOnlyTransferQ = true;
+      readOnlyCurrentQ = true;
+    });
+  }
+
+  void clearFieldCustom() {
+    _barcodeController.clear();
+    _quantityTransferController.clear();
+    _quantityCurrentController.clear();
+    _quantityReservedController.clear();
+
+    setState(() {
+      readOnlyBarcode = true;
+      readOnlyTransferQ = true;
+      readOnlyCurrentQ = true;
     });
   }
 }

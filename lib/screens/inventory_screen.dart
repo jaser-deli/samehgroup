@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/extensions/string.dart';
+import 'package:samehgroup/screens/barcode_scanner_screen.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
@@ -21,16 +21,22 @@ class InventoryScreen extends StatefulWidget {
 }
 
 class _InventoryScreenState extends State<InventoryScreen> {
+  // Theme
   late CustomTheme customTheme;
   late ThemeData theme;
 
+  // Text Editing
   late TextEditingController _barcodeController;
   late TextEditingController _quantityInventoryController;
   late TextEditingController _quantityInventoriedController;
 
+  // Focus Nodes
+  late FocusNode _barcodeFocusNode;
+
   // read only Field
   bool readOnly = true;
 
+  // information Data Set
   String invHead = "";
   String invDtlId = "";
   String storeNo = "";
@@ -43,6 +49,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
     _barcodeController = TextEditingController();
     _quantityInventoryController = TextEditingController();
     _quantityInventoriedController = TextEditingController();
+
+    _barcodeFocusNode = FocusNode();
 
     customTheme = AppTheme.customTheme;
     theme = AppTheme.theme;
@@ -61,7 +69,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
       var responseBody = json.decode(response.body);
 
       if (responseBody["data"] != null) {
-        // set Data
         setState(() {
           invHead = responseBody["data"]["inv_head_id"];
           invDtlId = responseBody["data"]["inv_dtl_id"];
@@ -72,8 +79,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
               responseBody["data"]["inv_qnty"];
         });
       } else {
-        //clear filed
-        clearFiled(true);
+        clearFiled();
 
         AwesomeDialog(
                 context: context,
@@ -89,24 +95,23 @@ class _InventoryScreenState extends State<InventoryScreen> {
   }
 
   Future<void> scanBarcode(BuildContext context) async {
-    String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666", 'back'.tr(), true, ScanMode.BARCODE);
-
-    if (!mounted) return;
-
+    var res = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BarcodeScannerScreen(),
+        ));
     setState(() {
-      if (barcodeScanRes != "-1") {
-        // set Data
-        _barcodeController.text = barcodeScanRes;
-      }
+      _barcodeController.text = res;
     });
   }
 
-  void save(String invHead, String invDtlId, String inventoryQuantity) async {
+  void save(String invHead, String invDtlId, String inventoryQuantity,
+      String barcode) async {
     Map<String, dynamic> body = {
       'inv_head_id': invHead,
       'inv_dtl_id': invDtlId,
       'inventory_quantity': inventoryQuantity,
+      'item_barcode': barcode,
     };
 
     var response = await http.post(Uri.parse(Api.inventorySave), body: body);
@@ -205,7 +210,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 maxLines: 1,
                 onTap: () {
                   //clear filed
-                  clearFiled(true);
+                  clearFiled();
                 },
                 decoration: InputDecoration(
                     prefixIcon: IconButton(
@@ -242,7 +247,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp("[0-9]")),
                 ],
               ),
               (readOnly)
@@ -397,7 +402,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
               FxSpacing.height(16),
@@ -407,12 +412,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   FxButton.medium(
                       borderRadiusAll: 8,
                       onPressed: () {
-                        // Insert Data
-                        save(invHead, invDtlId,
-                            _quantityInventoryController.text);
+                        save(
+                            invHead,
+                            invDtlId,
+                            _quantityInventoryController.text,
+                            _barcodeController.text);
 
-                        //clear filed
-                        clearFiled(true);
+                        clearFiled();
                       },
                       backgroundColor: customTheme.Primary,
                       child: FxText.labelLarge(
@@ -465,13 +471,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
     }
   }
 
-  void clearFiled(bool flag) {
+  void clearFiled() {
     _barcodeController.clear();
     _quantityInventoryController.clear();
     _quantityInventoriedController.clear();
 
     setState(() {
-      readOnly = flag;
+      readOnly = true;
     });
   }
 }

@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/extensions/string.dart';
+import 'package:samehgroup/screens/barcode_scanner_screen.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
@@ -21,19 +21,25 @@ class ReturnScreen extends StatefulWidget {
 }
 
 class _ReturnScreenState extends State<ReturnScreen> {
+  // Theme
   late CustomTheme customTheme;
   late ThemeData theme;
 
+  // Text Editing
   late TextEditingController _supplierController;
   late TextEditingController _barcodeController;
   late TextEditingController _quantityDestroyController;
   late TextEditingController _quantityReservedController;
 
+  // Focus Nodes
+  late FocusNode _supplierFocusNode;
+
+  // read only Field
   bool readOnlyBarcode = true;
   bool readOnlyQuantity = true;
 
-  int quantityDestroy = 0;
-
+  // information Data Set
+  double quantityDestroy = 0;
   String supplierName = "";
   String supplierNo = "";
   String branchNo = "";
@@ -49,20 +55,20 @@ class _ReturnScreenState extends State<ReturnScreen> {
     _quantityDestroyController = TextEditingController();
     _quantityReservedController = TextEditingController();
 
+    _supplierFocusNode = FocusNode();
+
     customTheme = AppTheme.customTheme;
     theme = AppTheme.theme;
   }
 
   Future<void> scanBarcode(BuildContext context) async {
-    String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666", 'back'.tr(), true, ScanMode.BARCODE);
-
-    if (!mounted) return;
-
+    var res = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BarcodeScannerScreen(),
+        ));
     setState(() {
-      if (barcodeScanRes != "-1") {
-        _barcodeController.text = barcodeScanRes;
-      }
+      _barcodeController.text = res;
     });
   }
 
@@ -79,15 +85,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
           supplierNo = responseBody["data"]["supp_no"];
         });
       } else {
-        _supplierController.clear();
-        _barcodeController.clear();
-        _quantityDestroyController.clear();
-        _quantityReservedController.clear();
-
-        setState(() {
-          readOnlyBarcode = true;
-          readOnlyQuantity = true;
-        });
+        clearFiled();
 
         AwesomeDialog(
                 context: context,
@@ -129,14 +127,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
         itemName = responseBody["data"]["item_name"];
         itemEquivelentQty = responseBody["data"]["itm_equivelent_qty"];
       } else {
-        _barcodeController.clear();
-        _quantityDestroyController.clear();
-        _quantityReservedController.clear();
-
-        setState(() {
-          readOnlyBarcode = true;
-          readOnlyQuantity = true;
-        });
+        clearFiled();
 
         AwesomeDialog(
                 context: context,
@@ -158,15 +149,8 @@ class _ReturnScreenState extends State<ReturnScreen> {
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
 
-      if (int.parse(responseBody["data"][0]["status"]) == 1) {
-        setState(() {
-          readOnlyBarcode = true;
-          readOnlyQuantity = true;
-        });
-
-        _barcodeController.clear();
-        _quantityDestroyController.clear();
-        _quantityReservedController.clear();
+      if (double.parse(responseBody["data"][0]["status"]) == 1) {
+        clearFiled();
 
         AwesomeDialog(
                 context: context,
@@ -177,15 +161,8 @@ class _ReturnScreenState extends State<ReturnScreen> {
                 btnOkText: 'ok'.tr(),
                 btnOkOnPress: () {})
             .show();
-      } else if (int.parse(responseBody["data"][0]["status"]) == 2) {
-        setState(() {
-          readOnlyBarcode = true;
-          readOnlyQuantity = true;
-        });
-
-        _barcodeController.clear();
-        _quantityDestroyController.clear();
-        _quantityReservedController.clear();
+      } else if (double.parse(responseBody["data"][0]["status"]) == 2) {
+        clearFiled();
 
         AwesomeDialog(
                 context: context,
@@ -230,7 +207,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
       var responseBody = json.decode(response.body);
       setState(() {
         quantityDestroy =
-            int.parse(responseBody["data"][0]["quantity_destroy"]);
+            double.parse(responseBody["data"][0]["quantity_destroy"]);
       });
     }
   }
@@ -250,13 +227,13 @@ class _ReturnScreenState extends State<ReturnScreen> {
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
 
-      if (responseBody["data"] != 1) {
+      if (responseBody["data"] == 1) {
         AwesomeDialog(
                 context: context,
                 dialogType: DialogType.success,
                 animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 'a_e_o'.tr(),
+                title: 'success'.tr(),
+                desc: 'o_a_s'.tr(),
                 btnOkText: 'ok'.tr(),
                 btnOkOnPress: () {})
             .show();
@@ -340,20 +317,18 @@ class _ReturnScreenState extends State<ReturnScreen> {
               FxTextField(
                 controller: _supplierController,
                 cursorColor: customTheme.Primary,
+                focusNode: _supplierFocusNode,
+                autofocus: true,
                 readOnly: false,
                 style: TextStyle(color: customTheme.Primary),
                 keyboardType: TextInputType.phone,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (value) {
+                  validation();
+                },
                 maxLines: 1,
                 onTap: () {
-                  _supplierController.clear();
-                  _barcodeController.clear();
-                  _quantityDestroyController.clear();
-                  _quantityReservedController.clear();
-
-                  setState(() {
-                    readOnlyBarcode = true;
-                    readOnlyQuantity = true;
-                  });
+                  clearFiled();
                 },
                 decoration: InputDecoration(
                     prefixIcon: Icon(
@@ -386,7 +361,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp("[0-9]")),
                 ],
               ),
               (readOnlyBarcode)
@@ -423,29 +398,8 @@ class _ReturnScreenState extends State<ReturnScreen> {
                 keyboardType: TextInputType.phone,
                 maxLines: 1,
                 onTap: () {
-                  if (_supplierController.text.isEmpty) {
-                    setState(() {
-                      readOnlyBarcode = true;
-                    });
-
-                    AwesomeDialog(
-                            context: context,
-                            dialogType: DialogType.error,
-                            animType: AnimType.BOTTOMSLIDE,
-                            title: 'error'.tr(),
-                            desc: 'p_e_supplier_no'.tr(),
-                            btnOkText: 'ok'.tr(),
-                            btnOkOnPress: () {})
-                        .show();
-                  } else {
-                    setState(() {
-                      readOnlyBarcode = false;
-                    });
-
-                    getSupplier(_supplierController.text);
-
-                    // await getItem();
-                  }
+                  validationField(_supplierController.text, 'p_e_supplier_no',
+                      getSupplier(_supplierController.text));
                 },
                 decoration: InputDecoration(
                     prefixIcon: IconButton(
@@ -481,7 +435,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp("[0-9]")),
                 ],
               ),
               (readOnlyQuantity)
@@ -614,7 +568,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
               FxSpacing.height(24),
@@ -655,7 +609,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
               FxSpacing.height(16),
@@ -665,46 +619,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                   FxButton.medium(
                       borderRadiusAll: 8,
                       onPressed: () {
-                        if (int.parse(_quantityReservedController.text) > 0) {
-                          AwesomeDialog(
-                                  context: context,
-                                  dialogType: DialogType.error,
-                                  animType: AnimType.BOTTOMSLIDE,
-                                  title: 'error'.tr(),
-                                  desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
-                                  btnOkText: 'ok'.tr(),
-                                  btnOkOnPress: () {})
-                              .show();
-                        } else if (int.parse(_quantityDestroyController.text) >
-                            quantityDestroy) {
-                          AwesomeDialog(
-                                  context: context,
-                                  dialogType: DialogType.error,
-                                  animType: AnimType.BOTTOMSLIDE,
-                                  title: 'error'.tr(),
-                                  desc: 't_r_q_is_g_t_t_c_q'.tr(),
-                                  btnOkText: 'ok'.tr(),
-                                  btnOkOnPress: () {})
-                              .show();
-                        } else {
-                          save(
-                              supplierNo.toString(),
-                              branchNo.toString(),
-                              itemNo.toString(),
-                              _barcodeController.text,
-                              itemEquivelentQty,
-                              _quantityDestroyController.text);
-                        }
-
-                        setState(() {
-                          readOnlyBarcode = true;
-                          readOnlyQuantity = true;
-                        });
-
-                        _supplierController.clear();
-                        _barcodeController.clear();
-                        _quantityDestroyController.clear();
-                        _quantityReservedController.clear();
+                        validation();
                       },
                       backgroundColor: customTheme.Primary,
                       child: FxText.labelLarge(
@@ -734,5 +649,97 @@ class _ReturnScreenState extends State<ReturnScreen> {
         );
       },
     );
+  }
+
+  void validation() {
+    if (_barcodeController.text.isNotEmpty) {
+      if (double.parse(_quantityReservedController.text) > 0) {
+        AwesomeDialog(
+                context: context,
+                dialogType: DialogType.error,
+                animType: AnimType.BOTTOMSLIDE,
+                title: 'error'.tr(),
+                desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
+                btnOkText: 'ok'.tr(),
+                btnOkOnPress: () {})
+            .show();
+      } else if (double.parse(_quantityDestroyController.text) >
+          quantityDestroy) {
+        AwesomeDialog(
+                context: context,
+                dialogType: DialogType.error,
+                animType: AnimType.BOTTOMSLIDE,
+                title: 'error'.tr(),
+                desc: 't_r_q_is_g_t_t_c_q'.tr(),
+                btnOkText: 'ok'.tr(),
+                btnOkOnPress: () {})
+            .show();
+      } else {
+        save(
+            supplierNo.toString(),
+            branchNo.toString(),
+            itemNo.toString(),
+            _barcodeController.text,
+            itemEquivelentQty,
+            _quantityDestroyController.text);
+
+        clearFiledCustom();
+      }
+    } else {
+      validationField(_barcodeController.text, 'p_e_barcode_no',
+          getSupplier(_supplierController.text));
+    }
+  }
+
+  void validationField(String text, String alert, Future future) async {
+    if (text.isEmpty) {
+      setState(() {
+        readOnlyBarcode = true;
+      });
+
+      AwesomeDialog(
+              context: context,
+              dialogType: DialogType.error,
+              animType: AnimType.BOTTOMSLIDE,
+              title: 'error'.tr(),
+              desc: alert.tr(),
+              btnOkText: 'ok'.tr(),
+              btnOkOnPress: () {})
+          .show();
+
+      _supplierFocusNode.requestFocus();
+    } else {
+      setState(() {
+        readOnlyBarcode = false;
+      });
+
+      await future;
+    }
+  }
+
+  void clearFiled() {
+    _supplierController.clear();
+    _barcodeController.clear();
+    _quantityDestroyController.clear();
+    _quantityReservedController.clear();
+
+    _supplierFocusNode.requestFocus();
+
+    setState(() {
+      readOnlyBarcode = true;
+      readOnlyQuantity = true;
+    });
+  }
+
+  void clearFiledCustom() {
+    _barcodeController.clear();
+    _quantityDestroyController.clear();
+    _quantityReservedController.clear();
+
+    _supplierFocusNode.requestFocus();
+
+    setState(() {
+      readOnlyQuantity = true;
+    });
   }
 }

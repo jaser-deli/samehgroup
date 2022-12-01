@@ -1,15 +1,8 @@
 import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
-
-// import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:samehgroup/screens/barcode_scanner_screen.dart';
-import 'package:simple_barcode_scanner/enum.dart';
-
-// import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
-
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
@@ -28,19 +21,23 @@ class DestroyScreen extends StatefulWidget {
 }
 
 class _DestroyScreenState extends State<DestroyScreen> {
+  // Theme
   late CustomTheme customTheme;
   late ThemeData theme;
 
+  // Text Editing
   late TextEditingController _barcodeController;
   late TextEditingController _quantityDestroyController;
   late TextEditingController _quantityReservedController;
 
+  // Focus Nodes
   late FocusNode _barcodeFocusNode;
+  late FocusNode _quantityDestroyFocusNode;
 
   // read only Field
   bool readOnly = true;
 
-  // information
+  // information Data Set
   String quantityDestroy = "";
   String branchNo = "";
   String itemNo = "";
@@ -53,68 +50,23 @@ class _DestroyScreenState extends State<DestroyScreen> {
     _barcodeController = TextEditingController();
     _quantityDestroyController = TextEditingController();
     _quantityReservedController = TextEditingController();
+
     _barcodeFocusNode = FocusNode();
+    _quantityDestroyFocusNode = FocusNode();
 
     customTheme = AppTheme.customTheme;
     theme = AppTheme.theme;
   }
 
-  // Future<void> scanBarcode(BuildContext context) async {
-  //   String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-  //       "#ff6666", 'back'.tr(), true, ScanMode.BARCODE);
-  //
-  //   if (!mounted) return;
-  //
-  //   setState(() {
-  //     if (barcodeScanRes != "-1") {
-  //       // set Data
-  //       _barcodeController.text = barcodeScanRes;
-  //     }
-  //   });
-  // }
-
-  // Future<void> scanBarcode(BuildContext context) async {
-  //   var options = ScanOptions(
-  //     restrictFormat: [BarcodeFormat.upce, BarcodeFormat.code128],
-  //   );
-  //
-  //   ScanResult result = await BarcodeScanner.scan(options: options);
-  //
-  //   print(result.format.toString());
-  // }
-
-  // Future<void> scanBarcode(BuildContext context) async {
-  //   String result = "";
-  //   var res = await Navigator.push(
-  //       context,
-  //       MaterialPageRoute(
-  //         builder: (context) => const SimpleBarcodeScannerPage(
-  //           scanType: ScanType.BARCODE,
-  //         ),
-  //       ));
-  //   setState(() {
-  //     if (res is String) {
-  //       result = res;
-  //     }
-  //   });
-  //
-  //   print(result);
-  // }
-
   Future<void> scanBarcode(BuildContext context) async {
-    String result = "";
     var res = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => const BarcodeScannerScreen(),
         ));
     setState(() {
-      if (res is String) {
-        result = res;
-      }
+      _barcodeController.text = res;
     });
-
-    print(result);
   }
 
   Future<void> getItem() async {
@@ -141,13 +93,11 @@ class _DestroyScreenState extends State<DestroyScreen> {
         await getQuantityDestroy(
             responseBody["data"]["branch_no"], responseBody["data"]["item_no"]);
 
-        // set Data
         branchNo = responseBody["data"]["branch_no"];
         itemNo = responseBody["data"]["item_no"];
         itemName = responseBody["data"]["item_name"];
         itemEquivelentQty = responseBody["data"]["itm_equivelent_qty"];
       } else {
-        //clear filed
         clearFiled();
 
         AwesomeDialog(
@@ -173,7 +123,6 @@ class _DestroyScreenState extends State<DestroyScreen> {
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
       setState(() {
-        // set Data
         _quantityReservedController.text =
             responseBody["data"][0]["quantity_reserved"];
       });
@@ -190,7 +139,6 @@ class _DestroyScreenState extends State<DestroyScreen> {
       var responseBody = json.decode(response.body);
 
       setState(() {
-        // set Data
         quantityDestroy = responseBody["data"][0]["quantity_destroy"];
       });
     }
@@ -213,7 +161,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
       if (responseBody["data"] != 1) {
         AwesomeDialog(
                 context: context,
-                dialogType: DialogType.success,
+                dialogType: DialogType.error,
                 animType: AnimType.BOTTOMSLIDE,
                 title: 'error'.tr(),
                 desc: 'a_e_o'.tr(),
@@ -306,16 +254,10 @@ class _DestroyScreenState extends State<DestroyScreen> {
                 keyboardType: TextInputType.phone,
                 textInputAction: TextInputAction.done,
                 onSubmitted: (value) {
-                  validation(
-                      _quantityReservedController.text,
-                      _quantityDestroyController.text,
-                      quantityDestroy,
-                      't_i_is_p_a_p_a_or_c_t_t',
-                      't_d_q_is_g_t_t_c_q');
+                  validation();
                 },
                 maxLines: 1,
                 onTap: () {
-                  //clear filed
                   clearFiled();
                 },
                 decoration: InputDecoration(
@@ -323,8 +265,12 @@ class _DestroyScreenState extends State<DestroyScreen> {
                       icon: Icon(Icons.qr_code),
                       color: customTheme.Primary,
                       onPressed: () {
-                        // Scan Barcode
-                        scanBarcode(context);
+                        scanBarcode(context).whenComplete(() async {
+                          if (_barcodeController.text.isNotEmpty) {
+                            _quantityDestroyFocusNode.requestFocus();
+                            await getItem();
+                          }
+                        });
                       },
                     ),
                     prefixIconColor: customTheme.Primary,
@@ -353,7 +299,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp("[0-9]")),
                 ],
               ),
               (readOnly)
@@ -383,7 +329,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
                             ),
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 0.8,
                         ),
                         Row(
@@ -402,7 +348,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
                             ),
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 0.8,
                         ),
                         Row(
@@ -421,7 +367,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
                             ),
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 0.8,
                         ),
                       ],
@@ -431,6 +377,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
                 controller: _quantityDestroyController,
                 cursorColor: customTheme.Primary,
                 readOnly: readOnly,
+                focusNode: _quantityDestroyFocusNode,
                 style: TextStyle(color: customTheme.Primary),
                 keyboardType: TextInputType.phone,
                 maxLines: 1,
@@ -467,7 +414,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
               FxSpacing.height(24),
@@ -508,7 +455,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
               FxSpacing.height(16),
@@ -518,12 +465,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
                   FxButton.medium(
                       borderRadiusAll: 8,
                       onPressed: () {
-                        validation(
-                            _quantityReservedController.text,
-                            _quantityDestroyController.text,
-                            quantityDestroy,
-                            't_i_is_p_a_p_a_or_c_t_t',
-                            't_d_q_is_g_t_t_c_q');
+                        validation();
                       },
                       backgroundColor: customTheme.Primary,
                       child: FxText.labelLarge(
@@ -554,26 +496,26 @@ class _DestroyScreenState extends State<DestroyScreen> {
     );
   }
 
-  void validation(String greater, String lesser, String destroy, String alertIf,
-      String alertElseIf) {
+  void validation() {
     if (_barcodeController.text.isNotEmpty) {
-      if (int.parse(greater) > 0) {
+      if (double.parse(_quantityReservedController.text) > 0) {
         AwesomeDialog(
                 context: context,
                 dialogType: DialogType.error,
                 animType: AnimType.BOTTOMSLIDE,
                 title: 'error'.tr(),
-                desc: alertIf.tr(),
+                desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
                 btnOkText: 'ok'.tr(),
                 btnOkOnPress: () {})
             .show();
-      } else if (int.parse(lesser) > int.parse(destroy)) {
+      } else if (double.parse(_quantityDestroyController.text) >
+          double.parse(quantityDestroy)) {
         AwesomeDialog(
                 context: context,
                 dialogType: DialogType.error,
                 animType: AnimType.BOTTOMSLIDE,
                 title: 'error'.tr(),
-                desc: alertElseIf.tr(),
+                desc: 't_d_q_is_g_t_t_c_q'.tr(),
                 btnOkText: 'ok'.tr(),
                 btnOkOnPress: () {})
             .show();

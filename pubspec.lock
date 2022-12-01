@@ -50,13 +50,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
-  barcode_scan2:
-    dependency: "direct main"
-    description:
-      name: barcode_scan2
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.2.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -183,25 +176,11 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.1.4"
-  fixnum:
-    dependency: transitive
-    description:
-      name: fixnum
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
   flutter:
     dependency: "direct main"
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_barcode_scanner:
-    dependency: "direct main"
-    description:
-      name: flutter_barcode_scanner
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0"
   flutter_feather_icons:
     dependency: "direct main"
     description:
@@ -259,13 +238,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_zxing:
-    dependency: "direct main"
-    description:
-      name: flutter_zxing
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.8.4"
   fluttertoast:
     dependency: "direct main"
     description:
@@ -378,6 +350,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.0"
+  mobile_scanner:
+    dependency: "direct main"
+    description:
+      name: mobile_scanner
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.0"
   nested:
     dependency: transitive
     description:
@@ -483,13 +462,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.2.4"
-  protobuf:
-    dependency: transitive
-    description:
-      name: protobuf
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.1.0"
   provider:
     dependency: "direct main"
     description:
@@ -574,13 +546,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.1"
-  simple_barcode_scanner:
-    dependency: "direct main"
-    description:
-      name: simple_barcode_scanner
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.5"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -712,13 +677,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
-  webview_windows:
-    dependency: transitive
-    description:
-      name: webview_windows
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.2"
   win32:
     dependency: transitive
     description:
@@ -749,4 +707,4 @@ packages:
     version: "3.1.1"
 sdks:
   dart: ">=2.18.2 <3.0.0"
-  flutter: ">=3.3.0"
+  flutter: ">=3.0.0"

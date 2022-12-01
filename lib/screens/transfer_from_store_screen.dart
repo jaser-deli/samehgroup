@@ -1,13 +1,12 @@
 import 'dart:convert';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/extensions/string.dart';
+import 'package:samehgroup/screens/barcode_scanner_screen.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
@@ -22,42 +21,42 @@ class TransferFromStore extends StatefulWidget {
 }
 
 class _TransferFromStoreState extends State<TransferFromStore> {
+  // Theme
   late CustomTheme customTheme;
   late ThemeData theme;
 
+  // Text Editing
   late TextEditingController _barcodeController;
   late TextEditingController _quantityTransferController;
   late TextEditingController _quantityCurrentController;
   late TextEditingController _quantityReservedController;
 
-  // select dropdown
+  // Select dropdown
   String _chosenValueStoreFrom = "";
   String _chosenValueStoreTo = "";
 
-  // lists
+  // Lists
   List stores = [];
 
-  // flags
+  // read only Field
   bool readOnlyBarcode = true;
   bool readOnlyTransferQ = true;
   bool readOnlyCurrentQ = true;
 
-  // information
+  // information Data Set
   String branchNo = "";
   String itemNo = "";
   String itemName = "";
   String itemEquivelentQty = "";
 
   Future<void> scanBarcode(BuildContext context) async {
-    String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666", 'back'.tr(), true, ScanMode.BARCODE);
-
-    if (!mounted) return;
-
+    var res = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BarcodeScannerScreen(),
+        ));
     setState(() {
-      if (barcodeScanRes != "-1") {
-        _barcodeController.text = barcodeScanRes;
-      }
+      _barcodeController.text = res;
     });
   }
 
@@ -88,8 +87,6 @@ class _TransferFromStoreState extends State<TransferFromStore> {
         _quantityCurrentController.text =
             responseBody["data"][0]["quantity_current"];
       });
-
-      print(responseBody["data"][0]["quantity_current"]);
     }
   }
 
@@ -106,7 +103,6 @@ class _TransferFromStoreState extends State<TransferFromStore> {
         _quantityReservedController.text =
             responseBody["data"][0]["quantity_reserved"];
       });
-      print(responseBody["data"][0]["quantity_reserved"]);
     }
   }
 
@@ -130,7 +126,6 @@ class _TransferFromStoreState extends State<TransferFromStore> {
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
 
-      print(responseBody["data"]);
       if (responseBody["data"] != null) {
         await getQuantityCurrent(userInfo["branch_no"],
             responseBody["data"]["item_no"], _chosenValueStoreFrom);
@@ -144,18 +139,7 @@ class _TransferFromStoreState extends State<TransferFromStore> {
           itemEquivelentQty = responseBody["data"]["itm_equivelent_qty"];
         });
       } else {
-        _barcodeController.clear();
-        _quantityTransferController.clear();
-        _quantityCurrentController.clear();
-        _quantityReservedController.clear();
-
-        setState(() {
-          _chosenValueStoreFrom = "";
-          _chosenValueStoreTo = "";
-          readOnlyBarcode = true;
-          readOnlyTransferQ = true;
-          readOnlyCurrentQ = true;
-        });
+        clearFiled();
 
         AwesomeDialog(
                 context: context,
@@ -192,13 +176,13 @@ class _TransferFromStoreState extends State<TransferFromStore> {
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
 
-      if (responseBody["data"] != 1) {
+      if (responseBody["data"] == 1) {
         AwesomeDialog(
                 context: context,
                 dialogType: DialogType.success,
                 animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 'a_e_o'.tr(),
+                title: 'success'.tr(),
+                desc: 'o_a_s'.tr(),
                 btnOkText: 'ok'.tr(),
                 btnOkOnPress: () {})
             .show();
@@ -225,7 +209,6 @@ class _TransferFromStoreState extends State<TransferFromStore> {
     };
 
     var response = await http.post(Uri.parse(Api.storesClear), body: body);
-    print(response.body);
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
 
@@ -317,43 +300,27 @@ class _TransferFromStoreState extends State<TransferFromStore> {
                               ? _chosenValueStoreFrom
                               : null,
                           onTap: () {
-                            _barcodeController.clear();
-                            _quantityTransferController.clear();
-                            _quantityCurrentController.clear();
-                            _quantityReservedController.clear();
-
-                            setState(() {
-                              _chosenValueStoreFrom = "";
-                              _chosenValueStoreTo = "";
-
-                              readOnlyBarcode = true;
-                              readOnlyTransferQ = true;
-                              readOnlyCurrentQ = true;
-                            });
+                            clearFiled();
                           },
                           decoration: new InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: customTheme.Primary,
-                                    width: 2.0),
+                                    color: customTheme.Primary, width: 2.0),
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: customTheme.Primary,
-                                    width: 2.0),
+                                    color: customTheme.Primary, width: 2.0),
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
                               errorBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: customTheme.Primary,
-                                    width: 2.0),
+                                    color: customTheme.Primary, width: 2.0),
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
                               focusedErrorBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: customTheme.Primary,
-                                    width: 2.0),
+                                    color: customTheme.Primary, width: 2.0),
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
                               // labelText: "From",
@@ -372,10 +339,10 @@ class _TransferFromStoreState extends State<TransferFromStore> {
                           },
                           items: stores
                               .map((item) => DropdownMenuItem<String>(
-                            child: FxText.bodyMedium(
-                                item["store_name_a"]),
-                            value: item["store_no"],
-                          ))
+                                    child:
+                                        FxText.bodyMedium(item["store_name_a"]),
+                                    value: item["store_no"],
+                                  ))
                               .toList()),
                     ),
                   ),
@@ -394,26 +361,22 @@ class _TransferFromStoreState extends State<TransferFromStore> {
                           decoration: new InputDecoration(
                               focusedBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: customTheme.Primary,
-                                    width: 2.0),
+                                    color: customTheme.Primary, width: 2.0),
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: customTheme.Primary,
-                                    width: 2.0),
+                                    color: customTheme.Primary, width: 2.0),
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
                               errorBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: customTheme.Primary,
-                                    width: 2.0),
+                                    color: customTheme.Primary, width: 2.0),
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
                               focusedErrorBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
-                                    color: customTheme.Primary,
-                                    width: 2.0),
+                                    color: customTheme.Primary, width: 2.0),
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
                               // labelText: "From",
@@ -432,10 +395,10 @@ class _TransferFromStoreState extends State<TransferFromStore> {
                           },
                           items: stores
                               .map((item) => DropdownMenuItem<String>(
-                            child: FxText.bodyMedium(
-                                item["store_name_a"]),
-                            value: item["store_no"],
-                          ))
+                                    child:
+                                        FxText.bodyMedium(item["store_name_a"]),
+                                    value: item["store_no"],
+                                  ))
                               .toList()),
                     ),
                   ),
@@ -457,14 +420,13 @@ class _TransferFromStoreState extends State<TransferFromStore> {
                     });
 
                     AwesomeDialog(
-                        context: context,
-                        dialogType: DialogType.error,
-                        animType: AnimType.BOTTOMSLIDE,
-                        title: 'error'.tr(),
-                        desc:
-                        'الرجاء اختيار المستودع المحول منه'.tr(),
-                        btnOkText: 'ok'.tr(),
-                        btnOkOnPress: () {})
+                            context: context,
+                            dialogType: DialogType.error,
+                            animType: AnimType.BOTTOMSLIDE,
+                            title: 'error'.tr(),
+                            desc: 'الرجاء اختيار المستودع المحول منه'.tr(),
+                            btnOkText: 'ok'.tr(),
+                            btnOkOnPress: () {})
                         .show();
                   } else {
                     setState(() {
@@ -506,80 +468,79 @@ class _TransferFromStoreState extends State<TransferFromStore> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(
-                      RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp("[0-9]")),
                 ],
               ),
               (readOnlyTransferQ)
                   ? Container()
                   : FxContainer(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FxText.titleMedium(
-                        'information_item'.tr(),
-                        fontWeight: 700,
-                      ),
-                      FxSpacing.height(8),
-                      Row(
-                        children: [
-                          FxContainer(
-                            paddingAll: 12,
-                            borderRadiusAll: 4,
-                            child: Text('item_no'.tr()),
-                            color: CustomTheme.peach.withAlpha(20),
-                          ),
-                          FxSpacing.width(16),
-                          Expanded(
-                            child: FxText.bodyLarge(
-                              itemNo,
+                      child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        FxText.titleMedium(
+                          'information_item'.tr(),
+                          fontWeight: 700,
+                        ),
+                        FxSpacing.height(8),
+                        Row(
+                          children: [
+                            FxContainer(
+                              paddingAll: 12,
+                              borderRadiusAll: 4,
+                              child: Text('item_no'.tr()),
+                              color: CustomTheme.peach.withAlpha(20),
                             ),
-                          ),
-                        ],
-                      ),
-                      Divider(
-                        thickness: 0.8,
-                      ),
-                      Row(
-                        children: [
-                          FxContainer(
-                            paddingAll: 12,
-                            borderRadiusAll: 4,
-                            child: Text('item_name'.tr()),
-                            color: CustomTheme.peach.withAlpha(20),
-                          ),
-                          FxSpacing.width(16),
-                          Expanded(
-                            child: FxText.bodyLarge(
-                              itemName,
+                            FxSpacing.width(16),
+                            Expanded(
+                              child: FxText.bodyLarge(
+                                itemNo,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      Divider(
-                        thickness: 0.8,
-                      ),
-                      Row(
-                        children: [
-                          FxContainer(
-                            paddingAll: 12,
-                            borderRadiusAll: 4,
-                            child: Text('packing'.tr()),
-                            color: CustomTheme.peach.withAlpha(20),
-                          ),
-                          FxSpacing.width(16),
-                          Expanded(
-                            child: FxText.bodyLarge(
-                              itemEquivelentQty,
+                          ],
+                        ),
+                        Divider(
+                          thickness: 0.8,
+                        ),
+                        Row(
+                          children: [
+                            FxContainer(
+                              paddingAll: 12,
+                              borderRadiusAll: 4,
+                              child: Text('item_name'.tr()),
+                              color: CustomTheme.peach.withAlpha(20),
                             ),
-                          ),
-                        ],
-                      ),
-                      Divider(
-                        thickness: 0.8,
-                      ),
-                    ],
-                  )),
+                            FxSpacing.width(16),
+                            Expanded(
+                              child: FxText.bodyLarge(
+                                itemName,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Divider(
+                          thickness: 0.8,
+                        ),
+                        Row(
+                          children: [
+                            FxContainer(
+                              paddingAll: 12,
+                              borderRadiusAll: 4,
+                              child: Text('packing'.tr()),
+                              color: CustomTheme.peach.withAlpha(20),
+                            ),
+                            FxSpacing.width(16),
+                            Expanded(
+                              child: FxText.bodyLarge(
+                                itemEquivelentQty,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Divider(
+                          thickness: 0.8,
+                        ),
+                      ],
+                    )),
               FxSpacing.height(24),
               FxTextField(
                 controller: _quantityTransferController,
@@ -595,13 +556,13 @@ class _TransferFromStoreState extends State<TransferFromStore> {
                     });
 
                     AwesomeDialog(
-                        context: context,
-                        dialogType: DialogType.error,
-                        animType: AnimType.BOTTOMSLIDE,
-                        title: 'error'.tr(),
-                        desc: 'p_e_barcode_no'.tr(),
-                        btnOkText: 'ok'.tr(),
-                        btnOkOnPress: () {})
+                            context: context,
+                            dialogType: DialogType.error,
+                            animType: AnimType.BOTTOMSLIDE,
+                            title: 'error'.tr(),
+                            desc: 'p_e_barcode_no'.tr(),
+                            btnOkText: 'ok'.tr(),
+                            btnOkOnPress: () {})
                         .show();
                   } else {
                     setState(() {
@@ -640,8 +601,7 @@ class _TransferFromStoreState extends State<TransferFromStore> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(
-                      RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
               FxSpacing.height(24),
@@ -682,8 +642,7 @@ class _TransferFromStoreState extends State<TransferFromStore> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(
-                      RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
               FxSpacing.height(24),
@@ -724,8 +683,7 @@ class _TransferFromStoreState extends State<TransferFromStore> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(
-                      RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
               FxSpacing.height(16),
@@ -735,55 +693,7 @@ class _TransferFromStoreState extends State<TransferFromStore> {
                   FxButton.medium(
                       borderRadiusAll: 8,
                       onPressed: () {
-                        if (int.parse(_quantityReservedController.text) >
-                            0) {
-                          AwesomeDialog(
-                              context: context,
-                              dialogType: DialogType.error,
-                              animType: AnimType.BOTTOMSLIDE,
-                              title: 'error'.tr(),
-                              desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
-                              btnOkText: 'ok'.tr(),
-                              btnOkOnPress: () {})
-                              .show();
-                        } else if (int.parse(
-                            _quantityTransferController.text) >
-                            int.parse(_quantityCurrentController.text)) {
-                          AwesomeDialog(
-                              context: context,
-                              dialogType: DialogType.error,
-                              animType: AnimType.BOTTOMSLIDE,
-                              title: 'error'.tr(),
-                              desc:
-                              'الكمية المحولة اكبر من الكمية الحاليه'
-                                  .tr(),
-                              btnOkText: 'ok'.tr(),
-                              btnOkOnPress: () {})
-                              .show();
-                        } else {
-                          save(
-                              branchNo,
-                              itemNo,
-                              _chosenValueStoreFrom,
-                              _chosenValueStoreTo,
-                              _barcodeController.text,
-                              itemEquivelentQty,
-                              _quantityTransferController.text);
-
-                          _barcodeController.clear();
-                          _quantityTransferController.clear();
-                          _quantityCurrentController.clear();
-                          _quantityReservedController.clear();
-
-                          setState(() {
-                            _chosenValueStoreFrom = "";
-                            _chosenValueStoreTo = "";
-
-                            readOnlyBarcode = true;
-                            readOnlyTransferQ = true;
-                            readOnlyCurrentQ = true;
-                          });
-                        }
+                        validation();
                       },
                       backgroundColor: customTheme.Primary,
                       child: FxText.labelLarge(
@@ -814,5 +724,98 @@ class _TransferFromStoreState extends State<TransferFromStore> {
         );
       },
     );
+  }
+
+  void validation() {
+    if (_barcodeController.text.isNotEmpty) {
+      if (double.parse(_quantityReservedController.text) > 0) {
+        AwesomeDialog(
+                context: context,
+                dialogType: DialogType.error,
+                animType: AnimType.BOTTOMSLIDE,
+                title: 'error'.tr(),
+                desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
+                btnOkText: 'ok'.tr(),
+                btnOkOnPress: () {})
+            .show();
+      } else if (double.parse(_quantityTransferController.text) >
+          double.parse(_quantityCurrentController.text)) {
+        AwesomeDialog(
+                context: context,
+                dialogType: DialogType.error,
+                animType: AnimType.BOTTOMSLIDE,
+                title: 'error'.tr(),
+                desc: 'الكمية المحولة اكبر من الكمية الحاليه'.tr(),
+                btnOkText: 'ok'.tr(),
+                btnOkOnPress: () {})
+            .show();
+      } else {
+        save(
+            branchNo,
+            itemNo,
+            _chosenValueStoreFrom,
+            _chosenValueStoreTo,
+            _barcodeController.text,
+            itemEquivelentQty,
+            _quantityTransferController.text);
+
+        clearFiledCustom();
+      }
+    } else {
+      validationField(
+          _barcodeController.text, 'p_e_barcode_no', getItemBarcode());
+    }
+  }
+
+  void validationField(String text, String alert, Future future) async {
+    if (text.isEmpty) {
+      setState(() {
+        readOnlyBarcode = true;
+      });
+
+      AwesomeDialog(
+              context: context,
+              dialogType: DialogType.error,
+              animType: AnimType.BOTTOMSLIDE,
+              title: 'error'.tr(),
+              desc: alert.tr(),
+              btnOkText: 'ok'.tr(),
+              btnOkOnPress: () {})
+          .show();
+    } else {
+      setState(() {
+        readOnlyBarcode = false;
+      });
+
+      await future;
+    }
+  }
+
+  void clearFiled() {
+    _barcodeController.clear();
+    _quantityTransferController.clear();
+    _quantityCurrentController.clear();
+    _quantityReservedController.clear();
+
+    setState(() {
+      _chosenValueStoreFrom = "";
+      _chosenValueStoreTo = "";
+      readOnlyBarcode = true;
+      readOnlyTransferQ = true;
+      readOnlyCurrentQ = true;
+    });
+  }
+
+  void clearFiledCustom() {
+    _barcodeController.clear();
+    _quantityTransferController.clear();
+    _quantityCurrentController.clear();
+    _quantityReservedController.clear();
+
+    setState(() {
+      readOnlyBarcode = true;
+      readOnlyTransferQ = true;
+      readOnlyCurrentQ = true;
+    });
   }
 }

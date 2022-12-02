@@ -12,6 +12,8 @@ import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class DestroyScreen extends StatefulWidget {
   const DestroyScreen({Key? key}) : super(key: key);
@@ -100,15 +102,12 @@ class _DestroyScreenState extends State<DestroyScreen> {
       } else {
         clearFiled();
 
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 'p_c_t_b_n_e'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 'p_c_t_b_n_e'.tr(),
+          ),
+        );
       }
     }
   }
@@ -159,15 +158,12 @@ class _DestroyScreenState extends State<DestroyScreen> {
       var responseBody = json.decode(response.body);
 
       if (responseBody["data"] != 1) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 'a_e_o'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 'a_e_o'.tr(),
+          ),
+        );
       }
     }
   }
@@ -187,15 +183,12 @@ class _DestroyScreenState extends State<DestroyScreen> {
       var responseBody = json.decode(response.body);
 
       if (responseBody["data"] == 1) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.success,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'success'.tr(),
-                desc: 'q_c_s'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.success(
+            message: 'q_c_s'.tr(),
+          ),
+        );
       }
     }
   }
@@ -499,28 +492,21 @@ class _DestroyScreenState extends State<DestroyScreen> {
   void validation() {
     if (_barcodeController.text.isNotEmpty) {
       if (double.parse(_quantityReservedController.text) > 0) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
+          ),
+        );
       } else if (double.parse(_quantityDestroyController.text) >
           double.parse(quantityDestroy)) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 't_d_q_is_g_t_t_c_q'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 't_d_q_is_g_t_t_c_q'.tr(),
+          ),
+        );
       } else {
-        // Insert Data
         save(branchNo.toString(), itemNo.toString(), _barcodeController.text,
             itemEquivelentQty, _quantityDestroyController.text);
 
@@ -528,7 +514,8 @@ class _DestroyScreenState extends State<DestroyScreen> {
         clearFiled();
       }
     } else {
-      validationField(_barcodeController.text, 'p_e_barcode_no', getItem());
+      validationField(
+          _barcodeController.text, 'p_e_barcode_no', getItem());
     }
   }
 
@@ -537,16 +524,12 @@ class _DestroyScreenState extends State<DestroyScreen> {
       setState(() {
         readOnly = true;
       });
-
-      AwesomeDialog(
-              context: context,
-              dialogType: DialogType.error,
-              animType: AnimType.BOTTOMSLIDE,
-              title: 'error'.tr(),
-              desc: alert.tr(),
-              btnOkText: 'ok'.tr(),
-              btnOkOnPress: () {})
-          .show();
+      showTopSnackBar(
+        Overlay.of(context)!,
+        CustomSnackBar.error(
+          message: alert.tr(),
+        ),
+      );
 
       _barcodeFocusNode.requestFocus();
     } else {

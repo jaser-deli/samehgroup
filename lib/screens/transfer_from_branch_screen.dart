@@ -12,6 +12,8 @@ import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class TransferFromBranch extends StatefulWidget {
   const TransferFromBranch({Key? key}) : super(key: key);
@@ -137,15 +139,12 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
       } else {
         clearField();
 
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 'p_c_t_b_n_e'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 'p_c_t_b_n_e'.tr(),
+          ),
+        );
       }
     }
   }
@@ -166,15 +165,12 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
       var responseBody = json.decode(response.body);
 
       if (responseBody["data"] == 1) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.success,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'success'.tr(),
-                desc: 'o_a_s'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.success(
+            message: 'o_a_s'.tr(),
+          ),
+        );
       }
     }
   }
@@ -195,15 +191,12 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
       var responseBody = json.decode(response.body);
 
       if (responseBody["data"] == 1) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.success,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'success'.tr(),
-                desc: 'q_c_s'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.success(
+            message: 'q_c_s'.tr(),
+          ),
+        );
       }
     }
   }
@@ -338,15 +331,12 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                       readOnlyBarcode = true;
                     });
 
-                    AwesomeDialog(
-                            context: context,
-                            dialogType: DialogType.error,
-                            animType: AnimType.BOTTOMSLIDE,
-                            title: 'error'.tr(),
-                            desc: 'الرجاء اختيار المستودع المحول منه'.tr(),
-                            btnOkText: 'ok'.tr(),
-                            btnOkOnPress: () {})
-                        .show();
+                    showTopSnackBar(
+                      Overlay.of(context)!,
+                      CustomSnackBar.error(
+                        message: 'الرجاء اختيار المستودع المحول منه'.tr(),
+                      ),
+                    );
                   } else {
                     setState(() {
                       readOnlyBarcode = false;
@@ -474,15 +464,10 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                       readOnlyTransferQ = true;
                     });
 
-                    AwesomeDialog(
-                            context: context,
-                            dialogType: DialogType.error,
-                            animType: AnimType.BOTTOMSLIDE,
-                            title: 'error'.tr(),
-                            desc: 'p_e_barcode_no'.tr(),
-                            btnOkText: 'ok'.tr(),
-                            btnOkOnPress: () {})
-                        .show();
+                    showTopSnackBar(
+                      Overlay.of(context)!,
+                      CustomSnackBar.error(message: 'p_e_barcode_no'.tr()),
+                    );
                   } else {
                     setState(() {
                       readOnlyTransferQ = false;
@@ -647,26 +632,18 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
   void validation() {
     if (_barcodeController.text.isNotEmpty) {
       if (double.parse(_quantityReservedController.text) > 0) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(message: 't_i_is_p_a_p_a_or_c_t_t'.tr()),
+        );
       } else if (double.parse(_quantityTransferController.text) >
           double.parse(_quantityCurrentController.text)) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 'الكمية المحولة اكبر من الكمية الحاليه'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 'الكمية المحولة اكبر من الكمية الحاليه'.tr(),
+          ),
+        );
       } else {
         save(branchNo, _chosenValueBranchTo, itemNo, _barcodeController.text,
             itemEquivelentQty, _quantityTransferController.text);
@@ -685,15 +662,12 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
         readOnlyBarcode = true;
       });
 
-      AwesomeDialog(
-              context: context,
-              dialogType: DialogType.error,
-              animType: AnimType.BOTTOMSLIDE,
-              title: 'error'.tr(),
-              desc: alert.tr(),
-              btnOkText: 'ok'.tr(),
-              btnOkOnPress: () {})
-          .show();
+      showTopSnackBar(
+        Overlay.of(context)!,
+        CustomSnackBar.error(
+          message: alert.tr(),
+        ),
+      );
     } else {
       setState(() {
         readOnlyBarcode = false;

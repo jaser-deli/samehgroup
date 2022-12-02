@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +11,8 @@ import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class ReturnScreen extends StatefulWidget {
   const ReturnScreen({Key? key}) : super(key: key);
@@ -87,15 +88,12 @@ class _ReturnScreenState extends State<ReturnScreen> {
       } else {
         clearFiled();
 
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 'p_c_t_s_n_e'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 'p_c_t_s_n_e'.tr(),
+          ),
+        );
       }
     }
   }
@@ -129,15 +127,12 @@ class _ReturnScreenState extends State<ReturnScreen> {
       } else {
         clearFiled();
 
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 'p_c_t_b_n_e'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 'p_c_t_b_n_e'.tr(),
+          ),
+        );
       }
     }
   }
@@ -152,27 +147,21 @@ class _ReturnScreenState extends State<ReturnScreen> {
       if (double.parse(responseBody["data"][0]["status"]) == 1) {
         clearFiled();
 
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 't_b_is_n_r_on_t_r'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 't_b_is_n_r_on_t_r'.tr(),
+          ),
+        );
       } else if (double.parse(responseBody["data"][0]["status"]) == 2) {
         clearFiled();
 
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 't_b_is_n_r_on_t_b'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 't_b_is_n_r_on_t_b'.tr(),
+          ),
+        );
       } else {
         await getItem();
       }
@@ -228,15 +217,12 @@ class _ReturnScreenState extends State<ReturnScreen> {
       var responseBody = json.decode(response.body);
 
       if (responseBody["data"] == 1) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.success,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'success'.tr(),
-                desc: 'o_a_s'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.success(
+            message: 'o_a_s'.tr(),
+          ),
+        );
       }
     }
   }
@@ -257,15 +243,12 @@ class _ReturnScreenState extends State<ReturnScreen> {
       var responseBody = json.decode(response.body);
 
       if (responseBody["data"] == 1) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.success,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'success'.tr(),
-                desc: 'q_c_s'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.success(
+            message: 'q_c_s'.tr(),
+          ),
+        );
       }
     }
   }
@@ -522,15 +505,12 @@ class _ReturnScreenState extends State<ReturnScreen> {
                       readOnlyQuantity = true;
                     });
 
-                    AwesomeDialog(
-                            context: context,
-                            dialogType: DialogType.error,
-                            animType: AnimType.BOTTOMSLIDE,
-                            title: 'error'.tr(),
-                            desc: 'p_e_barcode_no'.tr(),
-                            btnOkText: 'ok'.tr(),
-                            btnOkOnPress: () {})
-                        .show();
+                    showTopSnackBar(
+                      Overlay.of(context)!,
+                      CustomSnackBar.error(
+                        message: 'p_e_barcode_no'.tr(),
+                      ),
+                    );
                   } else {
                     setState(() {
                       readOnlyQuantity = false;
@@ -654,26 +634,20 @@ class _ReturnScreenState extends State<ReturnScreen> {
   void validation() {
     if (_barcodeController.text.isNotEmpty) {
       if (double.parse(_quantityReservedController.text) > 0) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
+          ),
+        );
       } else if (double.parse(_quantityDestroyController.text) >
           quantityDestroy) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 't_r_q_is_g_t_t_c_q'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 't_r_q_is_g_t_t_c_q'.tr(),
+          ),
+        );
       } else {
         save(
             supplierNo.toString(),
@@ -697,15 +671,12 @@ class _ReturnScreenState extends State<ReturnScreen> {
         readOnlyBarcode = true;
       });
 
-      AwesomeDialog(
-              context: context,
-              dialogType: DialogType.error,
-              animType: AnimType.BOTTOMSLIDE,
-              title: 'error'.tr(),
-              desc: alert.tr(),
-              btnOkText: 'ok'.tr(),
-              btnOkOnPress: () {})
-          .show();
+      showTopSnackBar(
+        Overlay.of(context)!,
+        CustomSnackBar.error(
+          message: alert.tr(),
+        ),
+      );
 
       _supplierFocusNode.requestFocus();
     } else {

@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,8 @@ import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({Key? key}) : super(key: key);
@@ -81,15 +84,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
       } else {
         clearFiled();
 
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.error,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 'p_c_t_b_n_e'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 'p_c_t_b_n_e'.tr(),
+          ),
+        );
       }
     }
   }
@@ -106,7 +106,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
   }
 
   void save(String invHead, String invDtlId, String inventoryQuantity,
-      String barcode) async {
+      String barcode, BuildContext context) async {
     Map<String, dynamic> body = {
       'inv_head_id': invHead,
       'inv_dtl_id': invDtlId,
@@ -118,16 +118,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
 
-      if (responseBody["data"] != 1) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.success,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'error'.tr(),
-                desc: 'a_e_o'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+      if (responseBody["data"] == 1) {
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.success(
+            message: 'o_a_s'.tr(),
+          ),
+        );
       }
     }
   }
@@ -144,15 +141,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
       var responseBody = json.decode(response.body);
 
       if (responseBody["data"] == 1) {
-        AwesomeDialog(
-                context: context,
-                dialogType: DialogType.success,
-                animType: AnimType.BOTTOMSLIDE,
-                title: 'success'.tr(),
-                desc: 'q_c_s'.tr(),
-                btnOkText: 'ok'.tr(),
-                btnOkOnPress: () {})
-            .show();
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.success(
+            message: 'q_c_s'.tr(),
+          ),
+        );
       }
     }
   }
@@ -361,7 +355,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
               FxSpacing.height(24),
@@ -416,7 +410,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             invHead,
                             invDtlId,
                             _quantityInventoryController.text,
-                            _barcodeController.text);
+                            _barcodeController.text,
+                            context);
 
                         clearFiled();
                       },
@@ -453,15 +448,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
         readOnly = true;
       });
 
-      AwesomeDialog(
-              context: context,
-              dialogType: DialogType.error,
-              animType: AnimType.BOTTOMSLIDE,
-              title: 'error'.tr(),
-              desc: alert.tr(),
-              btnOkText: 'ok'.tr(),
-              btnOkOnPress: () {})
-          .show();
+      showTopSnackBar(
+        Overlay.of(context)!,
+        CustomSnackBar.error(
+          message: alert.tr(),
+        ),
+      );
     } else {
       setState(() {
         readOnly = false;

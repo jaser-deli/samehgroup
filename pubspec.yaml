@@ -49,6 +49,7 @@ dependencies:
   url_launcher: ^6.1.6
   mobile_scanner: ^2.1.0
   fluttertoast: ^8.1.1
+  top_snackbar_flutter: ^3.0.0
   http: ^0.13.5
   shared_preferences: ^2.0.15
   awesome_dialog: ^3.0.2

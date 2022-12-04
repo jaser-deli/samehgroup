@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
@@ -12,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutx/flutx.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -27,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   late DateTime currentBackPressTime;
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   void _togglePassword() {
     setState(() {
@@ -47,19 +49,38 @@ class _LoginScreenState extends State<LoginScreen> {
   void login(String mobile, String password) async {
     Map<String, dynamic> body = {"username": mobile, "password": password};
 
-    var response = await http.post(Uri.parse(Api.login), body: body);
-    if (response.statusCode == 200) {
-      var responseBody = json.decode(response.body);
-      loginSuccessful(responseBody["data"]);
-    } else {
-      Fluttertoast.showToast(
-          msg: 't_u_or_p_in_or_in'.tr(),
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          textColor: Colors.white,
-          backgroundColor: const Color(0xff656565),
-          timeInSecForIosWeb: 1);
-      return;
+    try {
+      var response = await http.post(Uri.parse(Api.login), body: body);
+      if (response.statusCode == 200) {
+        var responseBody = json.decode(response.body);
+        loginSuccessful(responseBody["data"]);
+        setState(() {
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+
+        showTopSnackBar(
+          Overlay.of(context)!,
+          CustomSnackBar.error(
+            message: 't_u_or_p_in_or_in'.tr(),
+          ),
+        );
+        return;
+      }
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+
+      showTopSnackBar(
+        Overlay.of(context)!,
+        CustomSnackBar.error(
+          message: error.toString(),
+        ),
+      );
     }
   }
 
@@ -76,13 +97,12 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushNamedAndRemoveUntil(
           context, Screens.main.value, (Route<dynamic> route) => false);
     } else {
-      Fluttertoast.showToast(
-          msg: 't_is_a_p_w_t_s'.tr(),
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          textColor: Colors.white,
-          backgroundColor: const Color(0xff656565),
-          timeInSecForIosWeb: 1);
+      showTopSnackBar(
+        Overlay.of(context)!,
+        CustomSnackBar.error(
+          message: 't_is_a_p_w_t_s'.tr(),
+        ),
+      );
       return;
     }
   }
@@ -92,13 +112,13 @@ class _LoginScreenState extends State<LoginScreen> {
     if (currentBackPressTime == null ||
         now.difference(currentBackPressTime) > Duration(seconds: 2)) {
       currentBackPressTime = now;
-      Fluttertoast.showToast(
-          msg: 'p_t_b_b_to_e'.tr(),
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          textColor: Colors.white,
-          backgroundColor: const Color(0xff656565),
-          timeInSecForIosWeb: 1);
+
+      showTopSnackBar(
+        Overlay.of(context)!,
+        CustomSnackBar.error(
+          message: 'p_t_b_b_to_e'.tr(),
+        ),
+      );
       return Future.value(false);
     }
     return Future.value(true);
@@ -227,16 +247,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 //           color: customTheme.Primary)),
                 // ),
                 // FxSpacing.height(16),
-                FxButton.medium(
-                    borderRadiusAll: 8,
-                    onPressed: () {
-                      formValidator();
-                    },
-                    backgroundColor: customTheme.Primary,
-                    child: FxText.labelLarge(
-                      'login'.tr(),
-                      color: customTheme.OnPrimary,
-                    )),
+                Center(
+                  child: (_isLoading)
+                      ? CircularProgressIndicator()
+                      : FxButton.medium(
+                          borderRadiusAll: 8,
+                          onPressed: () {
+                            formValidator();
+                          },
+                          backgroundColor: customTheme.Primary,
+                          child: FxText.labelLarge(
+                            'login'.tr(),
+                            color: customTheme.OnPrimary,
+                          )),
+                ),
               ],
             ),
           ),
@@ -250,26 +274,28 @@ class _LoginScreenState extends State<LoginScreen> {
     String password = _passwordController.text;
 
     if (username.isEmpty) {
-      Fluttertoast.showToast(
-          msg: 'p_e_username'.tr(),
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          textColor: Colors.white,
-          backgroundColor: const Color(0xff656565),
-          timeInSecForIosWeb: 1);
+      showTopSnackBar(
+        Overlay.of(context)!,
+        CustomSnackBar.error(
+          message: 'p_e_username'.tr(),
+        ),
+      );
       return;
     }
 
     if (password.isEmpty) {
-      Fluttertoast.showToast(
-          msg: 'p_e_password'.tr(),
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          textColor: Colors.white,
-          backgroundColor: const Color(0xff656565),
-          timeInSecForIosWeb: 1);
+      showTopSnackBar(
+        Overlay.of(context)!,
+        CustomSnackBar.error(
+          message: 'p_e_password'.tr(),
+        ),
+      );
       return;
     }
+
+    setState(() {
+      _isLoading = true;
+    });
 
     login(username, password);
   }

@@ -144,7 +144,7 @@ class SinglePageItem extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(top: 16),
                 child:
-                    FxText.bodyLarge(title!, fontWeight: 600, color: textColor),
+                    FxText.bodyMedium(title!, fontWeight: 600, color: textColor, textAlign: TextAlign.center,),
               )
             ],
           ),

@@ -157,11 +157,11 @@ class _DestroyScreenState extends State<DestroyScreen> {
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
 
-      if (responseBody["data"] != 1) {
+      if (responseBody["data"] == 1) {
         showTopSnackBar(
           Overlay.of(context)!,
           CustomSnackBar.error(
-            message: 'a_e_o'.tr(),
+            message: 'o_a_s'.tr(),
           ),
         );
       }
@@ -514,8 +514,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
         clearFiled();
       }
     } else {
-      validationField(
-          _barcodeController.text, 'p_e_barcode_no', getItem());
+      validationField(_barcodeController.text, 'p_e_barcode_no', getItem());
     }
   }
 

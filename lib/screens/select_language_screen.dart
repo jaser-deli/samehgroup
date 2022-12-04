@@ -2,17 +2,21 @@ import 'dart:ui' as ui;
 import 'package:awesome_icons/awesome_icons.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutx/widgets/button/button.dart';
+import 'package:flutx/widgets/text/text.dart';
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/config/screens.dart';
 import 'package:samehgroup/config/style.dart';
 import 'package:samehgroup/extensions/string.dart';
+import 'package:samehgroup/localizations/language.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:samehgroup/widgets/tile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class SelectLanguageScreen extends StatefulWidget {
   const SelectLanguageScreen({Key? key}) : super(key: key);
@@ -52,13 +56,13 @@ class _SelectLanguageScreenState extends State<SelectLanguageScreen> {
     if (currentBackPressTime == null ||
         now.difference(currentBackPressTime) > Duration(seconds: 2)) {
       currentBackPressTime = now;
-      Fluttertoast.showToast(
-          msg: 'p_t_b_b_to_e'.tr(),
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          textColor: Colors.white,
-          backgroundColor: const Color(0xff656565),
-          timeInSecForIosWeb: 1);
+
+      showTopSnackBar(
+        Overlay.of(context)!,
+        CustomSnackBar.error(
+          message: 'p_t_b_b_to_e'.tr(),
+        ),
+      );
       return Future.value(false);
     }
     return Future.value(true);
@@ -72,12 +76,16 @@ class _SelectLanguageScreenState extends State<SelectLanguageScreen> {
           bottomNavigationBar: Container(
             height: 48,
             margin: paddingHorizontal.add(paddingVerticalMedium),
-            child: ElevatedButton(
-              onPressed: () {
-                changeLanguage(_language);
-              },
-              child: Text('save'.tr()),
-            ),
+            child: FxButton.medium(
+                borderRadiusAll: 8,
+                onPressed: () {
+                  changeLanguage(_language);
+                },
+                backgroundColor: customTheme.Primary,
+                child: FxText.labelLarge(
+                  'save'.tr(),
+                  color: customTheme.OnPrimary,
+                )),
           ),
           body: WillPopScope(
               onWillPop: onWillPop,
@@ -137,6 +145,13 @@ class _SelectLanguageScreenState extends State<SelectLanguageScreen> {
                                   if (!isSelected) {
                                     setState(() {
                                       _language = lang.languageCode;
+
+                                      setState(() {
+                                        Provider.of<AppNotifier>(context,
+                                                listen: false)
+                                            .changeLanguage(Language(
+                                                Locale(_language), ''));
+                                      });
                                     });
                                   }
                                 },
@@ -160,9 +175,8 @@ extension ConvertCodeToNativeName on Locale {
     switch (this.languageCode) {
       case 'en':
         return 'English';
-
       case 'ar':
-        return 'العربية';
+        return 'Arabic - العربية';
       default:
         return 'English';
     }

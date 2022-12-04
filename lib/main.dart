@@ -1,4 +1,3 @@
-import 'dart:ui' as ui;
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/config/screens.dart';
 import 'package:samehgroup/localizations/app_localization_delegate.dart';

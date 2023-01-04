@@ -57,7 +57,7 @@ dependencies:
   feather_icons: ^1.2.0
   flutter_holo_date_picker: ^1.1.0
   jiffy: ^5.0.0
-  camera: ^0.10.0+4
+  camera: ^0.10.1
   firebase_core: ^2.3.0
   flutter_local_notifications: ^12.0.4
   firebase_messaging: ^14.1.3

@@ -98,7 +98,7 @@ Future<Locale> getLanguage() async {
   String langCode =
       sharedPreferences.getString(ConfigSharedPreferences.langCode) ?? "";
 
-  return Locale(langCode, '');
+  return Locale(langCode);
 }
 
 class MyApp extends StatefulWidget {

@@ -13,8 +13,10 @@ import 'package:flutter/material.dart';
 import 'package:flutx/flutx.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -71,12 +73,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         icon: './assets/icons/transaction.png',
                         navigation: TransferFromBranch(),
                       ),
-                      SinglePageItem(
-                        iconColor: customTheme.Primary,
-                        title: 'receiving'.tr(),
-                        icon: './assets/icons/box.png',
-                        navigation: ReceivingScreen(),
-                      ),
+                      // SinglePageItem(
+                      //   iconColor: customTheme.Primary,
+                      //   title: 'receiving'.tr(),
+                      //   icon: './assets/icons/box.png',
+                      //   navigation: ReceivingScreen(),
+                      // ),
                       SinglePageItem(
                         iconColor: customTheme.Primary,
                         title: 'inventory'.tr(),

@@ -490,14 +490,16 @@ class _DestroyScreenState extends State<DestroyScreen> {
 
   void validation() {
     if (_barcodeController.text.isNotEmpty) {
-      if (double.parse(_quantityReservedController.text) > 0) {
-        showTopSnackBar(
-          Overlay.of(context)!,
-          CustomSnackBar.error(
-            message: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
-          ),
-        );
-      } else if (double.parse(_quantityDestroyController.text) >
+      // if (double.parse(_quantityReservedController.text) > 0) {
+      //   showTopSnackBar(
+      //     Overlay.of(context)!,
+      //     CustomSnackBar.error(
+      //       message: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
+      //     ),
+      //   );
+      // } else
+
+      if (double.parse(_quantityDestroyController.text) >
           double.parse(quantityDestroy)) {
         showTopSnackBar(
           Overlay.of(context)!,

@@ -9,10 +9,11 @@ class SelectLanguageDialog extends StatefulWidget {
   const SelectLanguageDialog({Key? key}) : super(key: key);
 
   @override
-  _SelectLanguageDialogState createState() => _SelectLanguageDialogState();
+  State<SelectLanguageDialog> createState() => _SelectLanguageDialogState();
 }
 
 class _SelectLanguageDialogState extends State<SelectLanguageDialog> {
+  late CustomTheme customTheme;
   late ThemeData themeData;
 
   Language currentLanguage = Language.currentLanguage;
@@ -20,6 +21,8 @@ class _SelectLanguageDialogState extends State<SelectLanguageDialog> {
 
   @override
   initState() {
+    customTheme = AppTheme.customTheme;
+
     super.initState();
   }
 
@@ -37,6 +40,7 @@ class _SelectLanguageDialogState extends State<SelectLanguageDialog> {
 
         return Dialog(
           child: Container(
+            color: FxAppTheme.theme.cardColor,
             padding: EdgeInsets.only(top: 16, bottom: 16),
             child: Column(
                 mainAxisSize: MainAxisSize.min, children: _buildOptions()),
@@ -65,9 +69,11 @@ class _SelectLanguageDialogState extends State<SelectLanguageDialog> {
                 groupValue: currentLanguage,
                 value: language,
                 activeColor: themeData.colorScheme.primary,
+                hoverColor: FxAppTheme.theme.primaryColor,
               ),
               FxText.titleSmall(
                 language.languageName,
+                color: FxAppTheme.theme.primaryColor,
                 fontWeight: 600,
               ),
             ],

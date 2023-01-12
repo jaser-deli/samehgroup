@@ -630,12 +630,14 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
 
   void validation() {
     if (_barcodeController.text.isNotEmpty) {
-      if (double.parse(_quantityReservedController.text) > 0) {
-        showTopSnackBar(
-          Overlay.of(context)!,
-          CustomSnackBar.error(message: 't_i_is_p_a_p_a_or_c_t_t'.tr()),
-        );
-      } else if (double.parse(_quantityTransferController.text) >
+      // if (double.parse(_quantityReservedController.text) > 0) {
+      //   showTopSnackBar(
+      //     Overlay.of(context)!,
+      //     CustomSnackBar.error(message: 't_i_is_p_a_p_a_or_c_t_t'.tr()),
+      //   );
+      // } else
+
+      if (double.parse(_quantityTransferController.text) >
           double.parse(_quantityCurrentController.text)) {
         showTopSnackBar(
           Overlay.of(context)!,

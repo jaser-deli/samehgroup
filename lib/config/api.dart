@@ -1,6 +1,12 @@
 class Api {
   static String baseUrl =
       "http://188.247.88.114:8084/samehgroup/public/api/v1/";
+
+  static String baseUrlMain =
+      "http://ls.samehgroup.com:8081/LiveSales_old_new/public/api/v1/";
+
+  static String app = "${baseUrlMain}apps";
+
   static String login = "${baseUrl}login";
   static String logout = "${baseUrl}logout";
 

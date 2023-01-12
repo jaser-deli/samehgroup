@@ -8,8 +8,10 @@ import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({Key? key}) : super(key: key);
+
   @override
-  _MainScreenState createState() => _MainScreenState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
@@ -63,6 +65,16 @@ class _MainScreenState extends State<MainScreen> {
                 TabItem(
                   icon: Icons.notifications,
                   title: 'notifications'.tr(),
+                  count: FxContainer.rounded(
+                    paddingAll: 4,
+                    color: theme.colorScheme.primary,
+                    child: Center(
+                        child: FxText.bodySmall(
+                      '1',
+                      color: theme.colorScheme.onPrimary,
+                      fontSize: 8,
+                    )),
+                  ),
                 ),
                 TabItem(
                   icon: Icons.account_box,

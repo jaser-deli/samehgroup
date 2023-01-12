@@ -633,15 +633,16 @@ class _ReturnScreenState extends State<ReturnScreen> {
 
   void validation() {
     if (_barcodeController.text.isNotEmpty) {
-      if (double.parse(_quantityReservedController.text) > 0) {
-        showTopSnackBar(
-          Overlay.of(context)!,
-          CustomSnackBar.error(
-            message: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
-          ),
-        );
-      } else if (double.parse(_quantityDestroyController.text) >
-          quantityDestroy) {
+      // if (double.parse(_quantityReservedController.text) > 0) {
+      //   showTopSnackBar(
+      //     Overlay.of(context)!,
+      //     CustomSnackBar.error(
+      //       message: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
+      //     ),
+      //   );
+      // } else
+
+      if (double.parse(_quantityDestroyController.text) > quantityDestroy) {
         showTopSnackBar(
           Overlay.of(context)!,
           CustomSnackBar.error(

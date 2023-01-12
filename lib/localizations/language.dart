@@ -14,7 +14,7 @@ class Language {
     Language(Locale('en'), "English"),
     Language(
       Locale('ar'),
-      "Arabic",
+      "Arabic - العربية",
       true,
     ),
   ];

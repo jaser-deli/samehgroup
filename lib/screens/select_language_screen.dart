@@ -136,11 +136,16 @@ class _SelectLanguageScreenState extends State<SelectLanguageScreen> {
                                   setState(() {
                                     _language = lang.languageCode;
 
-                                    setState(() {
+                                       setState(() {
                                       Provider.of<AppNotifier>(context,
                                               listen: false)
-                                          .changeLanguage(
-                                              Language(Locale(_language), ''));
+                                          .changeLanguage(Language(
+                                              Locale(_language),
+                                              Locale(_language)
+                                                  .convertCodeToNativeName(),
+                                              (_language == 'ar')
+                                                  ? true
+                                                  : false));
                                     });
                                   });
                                 }

@@ -34,7 +34,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.notification != null) {
     await Firebase.initializeApp();
     print('Handling a background message ${message.messageId}');
-    print(message.data);
     flutterLocalNotificationsPlugin.show(
         message.data.hashCode,
         message.data['title'],
@@ -166,6 +165,7 @@ class _MyAppState extends State<MyApp> {
               ),
             ));
       }
+      print(notification);
     });
     getToken();
   }

@@ -4,12 +4,14 @@ import 'package:flutx/widgets/button/button.dart';
 import 'package:flutx/widgets/text/text.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:provider/provider.dart';
+import 'package:flutx/flutx.dart';
 import 'package:samehgroup/config/style.dart';
 import 'package:samehgroup/extensions/string.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UpdateScreen extends StatefulWidget {
   const UpdateScreen({Key? key}) : super(key: key);
@@ -22,7 +24,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
   late CustomTheme customTheme;
   late ThemeData theme;
 
-  double valuePercent = 0.5;
+  int valuePercent = 0;
 
   @override
   void initState() {
@@ -41,11 +43,9 @@ class _UpdateScreenState extends State<UpdateScreen> {
               'http://ls.samehgroup.com:8081/LiveSales_old_new/public/storage/apps/pda.apk')
           .listen(
         (OtaEvent event) {
-          // setState(() => currentEvent = event);
-          if (valuePercent != -1) {
+          if (event.status.name == "DOWNLOADING") {
             setState(() {
-              valuePercent = double.parse(event.value.toString());
-              setState(() {});
+              valuePercent = int.parse(event.value.toString());
             });
           }
         },
@@ -60,20 +60,30 @@ class _UpdateScreenState extends State<UpdateScreen> {
     return Consumer<AppNotifier>(
       builder: (BuildContext context, AppNotifier value, Widget? child) {
         return Scaffold(
-          bottomNavigationBar: Container(
-            height: 50,
-            margin: paddingHorizontal.add(paddingVerticalMedium),
-            child: FxButton.medium(
-                borderRadiusAll: 8,
-                onPressed: () async {
-                  // await update();
-                },
-                backgroundColor: customTheme.Primary,
-                child: FxText.labelLarge(
-                  'تحميل'.tr(),
-                  color: customTheme.OnPrimary,
-                )),
-          ),
+          bottomNavigationBar: FxContainer(
+              color: customTheme.Primary.withAlpha(40),
+              padding: FxSpacing.xy(16, 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FxTwoToneIcon(
+                    FxTwoToneMdiIcons.headset_mic,
+                    size: 32,
+                    color: customTheme.Primary,
+                  ),
+                  FxSpacing.width(12),
+                  InkWell(
+                    onTap: () {
+                      launch("tel://+962786322012");
+                    },
+                    child: FxText.bodySmall(
+                      "help".tr(),
+                      color: customTheme.Primary,
+                      letterSpacing: 0,
+                    ),
+                  )
+                ],
+              )),
           body: WillPopScope(
             onWillPop: () async {
               if (Platform.isAndroid) {
@@ -88,45 +98,43 @@ class _UpdateScreenState extends State<UpdateScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 // crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('النسخة هذا غير مستقرة الرجاء تنزيل النسخة الجديدة'.tr(),
-                      style: theme.textTheme.subtitle1),
+                  Text('new_version'.tr(), style: theme.textTheme.subtitle1),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
-                  (valuePercent > 0.5)
+                  (valuePercent > 1)
                       ? Container(
                           padding: EdgeInsets.all(10),
-                          child: LinearPercentIndicator(
-                            //leaner progress bar
-                            width: 210,
-                            //width for progress bar
-                            animation: true,
-                            //animation to show progress at first
-                            animationDuration: 1000,
-                            lineHeight: 30.0,
-                            //height of progress bar
-                            leading: Padding(
-                              //prefix content
-                              padding: EdgeInsets.only(right: 15),
-                              child: Text("left content"), //left content
+                          child: CircularPercentIndicator(
+                            radius: 80.0,
+                            lineWidth: 2.0,
+                            percent: valuePercent / 100,
+                            center: Text(
+                              "$valuePercent%",
+                              style: TextStyle(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black),
                             ),
-                            trailing: Padding(
-                              //sufix content
-                              padding: EdgeInsets.only(left: 15),
-                              child: Text("right content"), //right content
-                            ),
-                            percent: 0.3,
-                            // 30/100 = 0.3
-                            center: Text("30.0%"),
-                            linearStrokeCap: LinearStrokeCap.roundAll,
-                            //make round cap at start and end both
+                            backgroundColor: Colors.grey[300]!,
+                            circularStrokeCap: CircularStrokeCap.round,
                             progressColor: Colors.redAccent,
-                            //percentage progress bar color
-                            backgroundColor: Colors
-                                .orange[100], //background progressbar color
-                          ),
-                        )
-                      : Container()
+                          ))
+                      : Container(),
+                  Container(
+                    height: 50,
+                    margin: paddingHorizontal.add(paddingVerticalMedium),
+                    child: FxButton.medium(
+                        borderRadiusAll: 8,
+                        onPressed: () async {
+                          await update();
+                        },
+                        backgroundColor: customTheme.Primary,
+                        child: FxText.labelLarge(
+                          'download'.tr(),
+                          color: customTheme.OnPrimary,
+                        )),
+                  )
                 ],
               ),
             ),

@@ -4,6 +4,8 @@
   "notifications": "Notifications",
   "settings": "Settings",
   "help": "If you need help, click here to contact us",
+  "new_version": "This version is not stable, please download the new version",
+  "download": "Download",
   "branch_name": "Branch Name",
   "branch_no": "Branch No",
   "store_no": "Store",

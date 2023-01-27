@@ -83,7 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await FirebaseMessaging.instance.deleteToken();
 
     Navigator.pushNamedAndRemoveUntil(
-        context, Screens.login.value, (Route<dynamic> route) => false);
+        context, Screens.language.value, (Route<dynamic> route) => false);
   }
 
   void changeTheme() {

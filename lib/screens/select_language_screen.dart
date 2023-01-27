@@ -28,7 +28,6 @@ class _SelectLanguageScreenState extends State<SelectLanguageScreen> {
   late CustomTheme customTheme;
   late ThemeData theme;
 
-  late DateTime currentBackPressTime;
   late String _language;
 
   List<Locale> languages = [const Locale('en'), const Locale('ar')];
@@ -88,7 +87,8 @@ class _SelectLanguageScreenState extends State<SelectLanguageScreen> {
                   // crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsetsDirectional.only(end: 25),
+                      margin: EdgeInsets.only(right: 25),
+                      // padding: const EdgeInsetsDirectional.only(end: 25),
                       child: Icon(
                         FontAwesomeIcons.language,
                         size: 76,
@@ -136,7 +136,7 @@ class _SelectLanguageScreenState extends State<SelectLanguageScreen> {
                                   setState(() {
                                     _language = lang.languageCode;
 
-                                       setState(() {
+                                    setState(() {
                                       Provider.of<AppNotifier>(context,
                                               listen: false)
                                           .changeLanguage(Language(

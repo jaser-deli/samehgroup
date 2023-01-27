@@ -56,10 +56,6 @@ Future<void> main() async {
 
   messaging = FirebaseMessaging.instance;
 
-  //If subscribe based sent notification then use this token
-  final fcmToken = await FirebaseMessaging.instance.getToken();
-  print(fcmToken);
-
   //If subscribe based on topic then use this
   await FirebaseMessaging.instance.subscribeToTopic('flutter_notification');
 

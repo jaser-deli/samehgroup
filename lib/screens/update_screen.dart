@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import 'package:flutx/widgets/button/button.dart';
 import 'package:flutx/widgets/text/text.dart';
@@ -12,6 +13,7 @@ import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:samehgroup/localizations/language.dart';
 
 class UpdateScreen extends StatefulWidget {
   const UpdateScreen({Key? key}) : super(key: key);
@@ -24,6 +26,8 @@ class _UpdateScreenState extends State<UpdateScreen> {
   late CustomTheme customTheme;
   late ThemeData theme;
 
+  late String _language;
+
   int valuePercent = 0;
 
   @override
@@ -31,6 +35,15 @@ class _UpdateScreenState extends State<UpdateScreen> {
     super.initState();
     customTheme = AppTheme.customTheme;
     theme = AppTheme.theme;
+
+    _language = ui.window.locale.languageCode;
+
+    setState(() {
+      Provider.of<AppNotifier>(context, listen: false).changeLanguage(Language(
+          Locale(_language),
+          Locale(_language).convertCodeToNativeName(),
+          (_language == 'ar') ? true : false));
+    });
   }
 
   Future<void> update() async {
@@ -142,5 +155,18 @@ class _UpdateScreenState extends State<UpdateScreen> {
         );
       },
     );
+  }
+}
+
+extension ConvertCodeToNativeName on Locale {
+  String convertCodeToNativeName() {
+    switch (this.languageCode) {
+      case 'en':
+        return 'English';
+      case 'ar':
+        return 'Arabic - العربية';
+      default:
+        return 'English';
+    }
   }
 }

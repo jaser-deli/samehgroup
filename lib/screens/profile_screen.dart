@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
@@ -79,6 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future logoutSuccessful(String response) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.clear();
+    await FirebaseMessaging.instance.deleteToken();
 
     Navigator.pushNamedAndRemoveUntil(
         context, Screens.login.value, (Route<dynamic> route) => false);

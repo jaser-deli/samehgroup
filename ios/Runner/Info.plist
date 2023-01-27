@@ -50,13 +50,13 @@
 		<key>UIStatusBarHidden</key>
 		<false/>
 		<key>LSApplicationQueriesSchemes</key>
-        <array>
-          <string>sms</string>
-          <string>tel</string>
-        </array>
-        <key>NSCameraUsageDescription</key>
-        <string>Camera permission is required for barcode scanning.</string>
-        <key>NSMicrophoneUsageDescription</key>
-        <string>your usage description here</string>
+		<array>
+			<string>sms</string>
+			<string>tel</string>
+		</array>
+		<key>NSCameraUsageDescription</key>
+		<string>Camera permission is required for barcode scanning.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>your usage description here</string>
 	</dict>
 </plist>

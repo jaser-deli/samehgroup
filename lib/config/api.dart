@@ -8,6 +8,7 @@ class Api {
   static String app = "${baseUrlMain}apps";
 
   static String login = "${baseUrl}login";
+  static String tokenUpdate = "${baseUrl}token_update";
   static String logout = "${baseUrl}logout";
 
   // Destroy

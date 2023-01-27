@@ -1,5 +1,6 @@
 import 'dart:convert';
-
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -7,7 +8,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/config/screens.dart';
-import 'package:samehgroup/extensions/string.dart';
 import 'package:samehgroup/localizations/app_localization_delegate.dart';
 import 'package:samehgroup/localizations/language.dart';
 import 'package:samehgroup/screens/home_screen.dart';
@@ -31,43 +31,79 @@ String loadView = "";
 Locale? locale;
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  if (message.notification != null) {
-    await Firebase.initializeApp();
-    print('Handling a background message ${message.messageId}');
-    flutterLocalNotificationsPlugin.show(
-        message.data.hashCode,
-        message.data['title'],
-        message.data['body'],
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            channelDescription: channel.description,
-          ),
-        ));
-  }
+  await Firebase.initializeApp();
 }
 
-const AndroidNotificationChannel channel = AndroidNotificationChannel(
-  'high_importance_channel', // id
-  'High Importance Notifications', // title
-  description: 'This channel is used for important notifications.',
-  importance: Importance.high,
-);
+AndroidNotificationChannel? channel;
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin? flutterLocalNotificationsPlugin;
+late FirebaseMessaging messaging;
+
+void notificationTapBackground(NotificationResponse notificationResponse) {
+  print('notification(${notificationResponse.id}) action tapped: '
+      '${notificationResponse.actionId} with'
+      ' payload: ${notificationResponse.payload}');
+  if (notificationResponse.input?.isNotEmpty ?? false) {
+    print(
+        'notification action tapped with input: ${notificationResponse.input}');
+  }
+}
 
 Future<void> main() async {
   //You will need to initialize AppThemeNotifier class for theme changes.
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
+  messaging = FirebaseMessaging.instance;
+
+  //If subscribe based sent notification then use this token
+  final fcmToken = await FirebaseMessaging.instance.getToken();
+  print(fcmToken);
+
+  //If subscribe based on topic then use this
+  await FirebaseMessaging.instance.subscribeToTopic('flutter_notification');
+
+  // Set the background messaging handler early on, as a named top-level function
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(channel);
+
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
+
+  print('User granted permission: ${settings.authorizationStatus}');
+
+  if (!kIsWeb) {
+    channel = const AndroidNotificationChannel(
+        'flutter_notification', // id
+        'flutter_notification_title', // title
+        importance: Importance.high,
+        enableLights: true,
+        enableVibration: true,
+        showBadge: true,
+        playSound: true);
+
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+    const android = AndroidInitializationSettings('@drawable/ic_launcher');
+    const iOS = DarwinInitializationSettings();
+    const initSettings = InitializationSettings(android: android, iOS: iOS);
+
+    await flutterLocalNotificationsPlugin!.initialize(initSettings,
+        onDidReceiveBackgroundNotificationResponse: notificationTapBackground);
+
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
 
   AppTheme.init();
 
@@ -78,7 +114,7 @@ Future<void> main() async {
     create: (context) => AppNotifier(),
     child: ChangeNotifierProvider<FxAppThemeNotifier>(
       create: (context) => FxAppThemeNotifier(),
-      child: MyApp(),
+      child: const MyApp(),
     ),
   ));
 }
@@ -91,16 +127,18 @@ Future<void> isUpdate() async {
   if (response.statusCode == 200) {
     var responseBody = json.decode(response.body);
 
-    Version currentVersion = Version.parse(packageInfo.version.toString());
-    Version latestVersion =
-        Version.parse(responseBody["data"][0]["version"].toString());
+    if (responseBody["data"][0] != null) {
+      Version currentVersion = Version.parse(packageInfo.version.toString());
+      Version latestVersion =
+          Version.parse(responseBody["data"][0]["version"].toString());
 
-    if (responseBody["data"] != null) {
       if (latestVersion > currentVersion) {
         loadView = Screens.update.value;
       } else {
         loadView = await isLogin();
       }
+    } else {
+      loadView = await isLogin();
     }
   }
 }
@@ -131,43 +169,47 @@ Future<Locale> getLanguage() async {
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  String? token;
-
   @override
   void initState() {
     super.initState();
 
-    var initialzationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    var initializationSettings =
-        InitializationSettings(android: initialzationSettingsAndroid);
-
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessage.listen((message) async {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
-      if (notification != null && android != null) {
-        flutterLocalNotificationsPlugin.show(
+
+      if (notification != null && android != null && !kIsWeb) {
+        String action = jsonEncode(message.data);
+
+        flutterLocalNotificationsPlugin!.show(
             notification.hashCode,
             notification.title,
             notification.body,
             NotificationDetails(
               android: AndroidNotificationDetails(
-                channel.id,
-                channel.name,
-                channelDescription: channel.description,
-                icon: android.smallIcon,
+                channel!.id,
+                channel!.name,
+                priority: Priority.high,
+                importance: Importance.max,
+                setAsGroupSummary: true,
+                styleInformation: const DefaultStyleInformation(true, true),
+                largeIcon:
+                    const DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+                channelShowBadge: true,
+                autoCancel: true,
+                icon: '@drawable/ic_launcher',
               ),
-            ));
+            ),
+            payload: action);
       }
-      print(notification);
+      print('A new event was published!');
     });
-    getToken();
   }
 
   @override
@@ -195,32 +237,27 @@ class _MyAppState extends State<MyApp> {
           locale: locale,
           initialRoute: loadView,
           routes: {
-            Screens.login.value: (context) => LoginScreen(),
-            Screens.main.value: (context) => MainScreen(),
-            Screens.home.value: (context) => HomeScreen(),
-            Screens.profile.value: (context) => ProfileScreen(),
-            Screens.language.value: (context) => SelectLanguageScreen(),
-            Screens.update.value: (context) => UpdateScreen()
+            Screens.login.value: (context) => const LoginScreen(),
+            Screens.main.value: (context) => const MainScreen(),
+            Screens.home.value: (context) => const HomeScreen(),
+            Screens.profile.value: (context) => const ProfileScreen(),
+            Screens.language.value: (context) => const SelectLanguageScreen(),
+            Screens.update.value: (context) => const UpdateScreen()
           },
         );
       },
     );
   }
 
-  getToken() async {
-    token = await FirebaseMessaging.instance.getToken();
-    setState(() {
-      token = token;
-    });
-    print(token);
-  }
-
   void loadImage(BuildContext context) {
-    precacheImage(AssetImage("./assets/images/logo.png"), context);
-    precacheImage(AssetImage("./assets/icons/global_outline.png"), context);
-    precacheImage(AssetImage("./assets/icons/moon_outline.png"), context);
-    precacheImage(AssetImage("./assets/icons/paper-shredder.png"), context);
-    precacheImage(AssetImage("./assets/icons/rocket-outline.png"), context);
-    precacheImage(AssetImage("./assets/icons/sun_outline.png"), context);
+    precacheImage(const AssetImage("./assets/images/logo.png"), context);
+    precacheImage(
+        const AssetImage("./assets/icons/global_outline.png"), context);
+    precacheImage(const AssetImage("./assets/icons/moon_outline.png"), context);
+    precacheImage(
+        const AssetImage("./assets/icons/paper-shredder.png"), context);
+    precacheImage(
+        const AssetImage("./assets/icons/rocket-outline.png"), context);
+    precacheImage(const AssetImage("./assets/icons/sun_outline.png"), context);
   }
 }

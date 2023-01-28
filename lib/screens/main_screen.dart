@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:awesome_bottom_bar/awesome_bottom_bar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:samehgroup/config/api.dart';
+import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/extensions/string.dart';
 import 'package:samehgroup/screens/home_screen.dart';
 import 'package:samehgroup/screens/notification_screen.dart';
@@ -6,6 +11,7 @@ import 'package:samehgroup/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -29,6 +35,39 @@ class _MainScreenState extends State<MainScreen> {
     theme = AppTheme.theme;
 
     _pageController = PageController();
+
+    init();
+  }
+
+  Future<void> init() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    //If subscribe based sent notification then use this token
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+
+    Map<String, dynamic> userInfo = jsonDecode(
+            preferences.getString(ConfigSharedPreferences.userInfo) ?? '{}')
+        as Map<String, dynamic>;
+
+    if (fcmToken!.isNotEmpty) {
+      updateToken(userInfo["user_name"].toString(), fcmToken);
+    }
+  }
+
+  Future<void> updateToken(String username, String token) async {
+    Map<String, dynamic> body = {
+      'username': username,
+      'token': token,
+    };
+
+    var response = await http.post(Uri.parse(Api.tokenUpdate), body: body);
+    if (response.statusCode == 200) {
+      var responseBody = json.decode(response.body);
+
+      if (responseBody["data"] == 1) {
+        print(token);
+      }
+    }
   }
 
   @override

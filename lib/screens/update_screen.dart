@@ -6,12 +6,14 @@ import 'package:flutx/widgets/text/text.dart';
 import 'package:ota_update/ota_update.dart';
 import 'package:provider/provider.dart';
 import 'package:flutx/flutx.dart';
+import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/config/style.dart';
 import 'package:samehgroup/extensions/string.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:samehgroup/localizations/language.dart';
 
@@ -38,11 +40,33 @@ class _UpdateScreenState extends State<UpdateScreen> {
 
     _language = ui.window.locale.languageCode;
 
+    init();
+  }
+
+  Future<void> init() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    bool isLangSelect =
+        sharedPreferences.getBool(ConfigSharedPreferences.isLangSelect) ??
+            false;
+
+    String langCode =
+        sharedPreferences.getString(ConfigSharedPreferences.langCode) ?? "";
+
     setState(() {
-      Provider.of<AppNotifier>(context, listen: false).changeLanguage(Language(
-          Locale(_language),
-          Locale(_language).convertCodeToNativeName(),
-          (_language == 'ar') ? true : false));
+      if (isLangSelect) {
+        Provider.of<AppNotifier>(context, listen: false).changeLanguage(
+            Language(
+                Locale(langCode),
+                Locale(langCode).convertCodeToNativeName(),
+                (langCode == 'ar') ? true : false));
+      } else {
+        Provider.of<AppNotifier>(context, listen: false).changeLanguage(
+            Language(
+                Locale(_language),
+                Locale(_language).convertCodeToNativeName(),
+                (_language == 'ar') ? true : false));
+      }
     });
   }
 

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
@@ -92,9 +91,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Future loginSuccessful(Map<String, dynamic> response) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
-    //If subscribe based sent notification then use this token
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-
     if (response["token"].toString().isNotEmpty) {
       // save token in SharedPreferences
       preferences.setString(ConfigSharedPreferences.token, response["token"]);
@@ -102,10 +98,6 @@ class _LoginScreenState extends State<LoginScreen> {
       // save User Info in SharedPreferences
       preferences.setString(
           ConfigSharedPreferences.userInfo, jsonEncode(response["user_info"]));
-
-      if (fcmToken!.isNotEmpty) {
-        updateToken(_usernameController.text, fcmToken);
-      }
 
       // go to Main Screen
       Navigator.pushNamedAndRemoveUntil(
@@ -118,22 +110,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
       return;
-    }
-  }
-
-  Future<void> updateToken(String username, String token) async {
-    Map<String, dynamic> body = {
-      'username': username,
-      'token': token,
-    };
-
-    var response = await http.post(Uri.parse(Api.tokenUpdate), body: body);
-    if (response.statusCode == 200) {
-      var responseBody = json.decode(response.body);
-
-      if (responseBody["data"] == 1) {
-        print(token);
-      }
     }
   }
 

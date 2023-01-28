@@ -106,6 +106,7 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   await isUpdate();
+
   runApp(ChangeNotifierProvider<AppNotifier>(
     create: (context) => AppNotifier(),
     child: ChangeNotifierProvider<FxAppThemeNotifier>(
@@ -142,6 +143,7 @@ Future<void> isUpdate() async {
 Future<String> isLogin() async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
   String? token = preferences.getString(ConfigSharedPreferences.token);
+
   bool isLangSelect =
       preferences.getBool(ConfigSharedPreferences.isLangSelect) ?? false;
 

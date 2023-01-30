@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/scheduler.dart' as schedulerBinding;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/config/screens.dart';
+import 'package:samehgroup/extensions/theme_extension.dart';
 import 'package:samehgroup/localizations/app_localization_delegate.dart';
 import 'package:samehgroup/localizations/language.dart';
 import 'package:samehgroup/screens/home_screen.dart';
@@ -23,6 +25,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutx/themes/app_theme_notifier.dart';
 import 'package:provider/provider.dart';
+import 'package:samehgroup/theme/theme_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:version/version.dart';
@@ -103,6 +106,8 @@ Future<void> main() async {
 
   AppTheme.init();
 
+  await checkTheme();
+
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   await isUpdate();
@@ -164,6 +169,20 @@ Future<Locale> getLanguage() async {
       sharedPreferences.getString(ConfigSharedPreferences.langCode) ?? "";
 
   return Locale(langCode);
+}
+
+Future<void> checkTheme() async {
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+  if (sharedPreferences.getString("theme_mode") == null) {
+    sharedPreferences.setString(
+        "theme_mode",
+        (schedulerBinding.SchedulerBinding.instance.platformDispatcher
+                    .platformBrightness ==
+                Brightness.light)
+            ? ThemeType.light.toText
+            : ThemeType.dark.toText);
+  }
 }
 
 class MyApp extends StatefulWidget {

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:awesome_bottom_bar/awesome_bottom_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/extensions/string.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:samehgroup/theme/app_notifier.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -72,67 +74,70 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-        data: theme.copyWith(
-            colorScheme: theme.colorScheme
-                .copyWith(secondary: customTheme.Primary.withAlpha(40))),
-        child: Scaffold(
-          backgroundColor: FxAppTheme.theme.scaffoldBackgroundColor,
-          body: SizedBox.expand(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() => currentIndex = index);
-                setState(() {});
-              },
-              children: <Widget>[
-                HomeScreen(),
-                NotificationScreen(),
-                ProfileScreen()
-              ],
+    return Consumer<AppNotifier>(
+        builder: (BuildContext context, AppNotifier value, Widget? child) {
+      return Theme(
+          data: theme.copyWith(
+              colorScheme: theme.colorScheme
+                  .copyWith(secondary: customTheme.Primary.withAlpha(40))),
+          child: Scaffold(
+            backgroundColor: FxAppTheme.theme.scaffoldBackgroundColor,
+            body: SizedBox.expand(
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() => currentIndex = index);
+                  setState(() {});
+                },
+                children: <Widget>[
+                  HomeScreen(),
+                  NotificationScreen(),
+                  ProfileScreen()
+                ],
+              ),
             ),
-          ),
-          bottomNavigationBar: Container(
-            color: FxAppTheme.theme.scaffoldBackgroundColor,
-            padding: const EdgeInsets.only(bottom: 20, right: 32, left: 32),
-            child: BottomBarFloating(
-              items: [
-                TabItem(
-                  icon: Icons.home,
-                  title: 'home'.tr(),
-                ),
-                TabItem(
-                  icon: Icons.notifications,
-                  title: 'notifications'.tr(),
-                  count: FxContainer.rounded(
-                    paddingAll: 4,
-                    color: theme.colorScheme.primary,
-                    child: Center(
-                        child: FxText.bodySmall(
-                      '1',
-                      color: theme.colorScheme.onPrimary,
-                      fontSize: 8,
-                    )),
+            bottomNavigationBar: Container(
+              color: FxAppTheme.theme.scaffoldBackgroundColor,
+              padding: const EdgeInsets.only(bottom: 20, right: 32, left: 32),
+              child: BottomBarFloating(
+                items: [
+                  TabItem(
+                    icon: Icons.home,
+                    title: 'home'.tr(),
                   ),
-                ),
-                TabItem(
-                  icon: Icons.account_box,
-                  title: 'profile'.tr(),
-                ),
-              ],
-              backgroundColor: FxAppTheme.theme.cardColor,
-              color: FxAppTheme.theme.primaryColor,
-              colorSelected: customTheme.Primary,
-              indexSelected: currentIndex,
-              paddingVertical: 16,
-              borderRadius: BorderRadius.circular(10),
-              onTap: (index) => setState(() {
-                setState(() => currentIndex = index);
-                _pageController.jumpToPage(index);
-              }),
+                  TabItem(
+                    icon: Icons.notifications,
+                    title: 'notifications'.tr(),
+                    count: FxContainer.rounded(
+                      paddingAll: 4,
+                      color: theme.colorScheme.primary,
+                      child: Center(
+                          child: FxText.bodySmall(
+                        '1',
+                        color: theme.colorScheme.onPrimary,
+                        fontSize: 8,
+                      )),
+                    ),
+                  ),
+                  TabItem(
+                    icon: Icons.account_box,
+                    title: 'profile'.tr(),
+                  ),
+                ],
+                backgroundColor: FxAppTheme.theme.cardColor,
+                color: FxAppTheme.theme.primaryColor,
+                colorSelected: customTheme.Primary,
+                indexSelected: currentIndex,
+                paddingVertical: 16,
+                borderRadius: BorderRadius.circular(10),
+                onTap: (index) => setState(() {
+                  setState(() => currentIndex = index);
+                  _pageController.jumpToPage(index);
+                }),
+              ),
             ),
-          ),
-        ));
+          ));
+    });
   }
 
   @override

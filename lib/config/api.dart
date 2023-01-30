@@ -6,6 +6,8 @@ class Api {
       "http://ls.samehgroup.com:8081/LiveSales_old_new/public/api/v1/";
 
   static String app = "${baseUrlMain}apps";
+  static String notifications = "${baseUrlMain}notifications";
+  static String notificationUpdate = "${baseUrlMain}notifications/update";
 
   static String login = "${baseUrl}login";
   static String tokenUpdate = "${baseUrl}token_update";

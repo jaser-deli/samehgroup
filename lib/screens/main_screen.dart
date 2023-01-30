@@ -30,6 +30,8 @@ class _MainScreenState extends State<MainScreen> {
 
   int currentIndex = 0;
 
+  int count = 0;
+
   @override
   void initState() {
     super.initState();
@@ -39,6 +41,7 @@ class _MainScreenState extends State<MainScreen> {
     _pageController = PageController();
 
     init();
+    notifications();
   }
 
   Future<void> init() async {
@@ -69,6 +72,24 @@ class _MainScreenState extends State<MainScreen> {
       if (responseBody["data"] == 1) {
         print(token);
       }
+    }
+  }
+
+  Future<void> notifications() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    Map<String, dynamic> userInfo = jsonDecode(
+            preferences.getString(ConfigSharedPreferences.userInfo) ?? '{}')
+        as Map<String, dynamic>;
+
+    var response = await http.get(
+        Uri.parse("${Api.notifications}/${userInfo["user_name"].toString()}"));
+
+    if (response.statusCode == 200) {
+      var responseBody = json.decode(response.body);
+      setState(() {
+        count = responseBody["count"];
+      });
     }
   }
 
@@ -108,16 +129,18 @@ class _MainScreenState extends State<MainScreen> {
                   TabItem(
                     icon: Icons.notifications,
                     title: 'notifications'.tr(),
-                    count: FxContainer.rounded(
-                      paddingAll: 4,
-                      color: theme.colorScheme.primary,
-                      child: Center(
-                          child: FxText.bodySmall(
-                        '1',
-                        color: theme.colorScheme.onPrimary,
-                        fontSize: 8,
-                      )),
-                    ),
+                    count: (count > 0)
+                        ? FxContainer.rounded(
+                            paddingAll: 4,
+                            color: theme.colorScheme.primary,
+                            child: Center(
+                                child: FxText.bodySmall(
+                              '$count',
+                              color: theme.colorScheme.onPrimary,
+                              fontSize: 8,
+                            )),
+                          )
+                        : Container(),
                   ),
                   TabItem(
                     icon: Icons.account_box,
@@ -133,6 +156,7 @@ class _MainScreenState extends State<MainScreen> {
                 onTap: (index) => setState(() {
                   setState(() => currentIndex = index);
                   _pageController.jumpToPage(index);
+                  notifications();
                 }),
               ),
             ),

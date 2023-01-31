@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:samehgroup/screens/barcode_scanner_screen.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
 import 'package:samehgroup/extensions/string.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class PricingScreen extends StatefulWidget {
   const PricingScreen({Key? key}) : super(key: key);
@@ -20,16 +23,35 @@ class _PricingScreenState extends State<PricingScreen> {
   final List<bool> _dataExpansionPanel = [true];
 
   late TextEditingController _barcodeController;
+  late TextEditingController _pOldItemPriceController;
 
-  bool readOnlyBarcode = false;
+  late FocusNode _barcodeFocusNode;
+  late FocusNode _pOldItemPriceFocusNode;
+
+  bool readOnly = true;
 
   @override
   void initState() {
     super.initState();
     _barcodeController = TextEditingController();
+    _pOldItemPriceController = TextEditingController();
+
+    _barcodeFocusNode = FocusNode();
+    _pOldItemPriceFocusNode = FocusNode();
 
     customTheme = AppTheme.customTheme;
     theme = AppTheme.theme;
+  }
+
+  Future<void> scanBarcode(BuildContext context) async {
+    var res = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BarcodeScannerScreen(),
+        ));
+    setState(() {
+      _barcodeController.text = res;
+    });
   }
 
   @override
@@ -79,41 +101,30 @@ class _PricingScreenState extends State<PricingScreen> {
               FxTextField(
                 controller: _barcodeController,
                 cursorColor: customTheme.Primary,
+                focusNode: _barcodeFocusNode,
                 readOnly: false,
+                autofocus: true,
                 style: TextStyle(color: customTheme.Primary),
                 keyboardType: TextInputType.phone,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (value) {
+                  validation();
+                },
                 maxLines: 1,
                 onTap: () {
-                  // if (_supplierController.text.isEmpty) {
-                  //   setState(() {
-                  //     readOnlyBarcode = true;
-                  //   });
-                  //
-                  //   AwesomeDialog(
-                  //       context: context,
-                  //       dialogType: DialogType.error,
-                  //       animType: AnimType.BOTTOMSLIDE,
-                  //       title: 'error'.tr(),
-                  //       desc: 'p_e_supplier_no'.tr(),
-                  //       btnOkText: 'ok'.tr(),
-                  //       btnOkOnPress: () {})
-                  //       .show();
-                  // } else {
-                  //   setState(() {
-                  //     readOnlyBarcode = false;
-                  //   });
-                  //
-                  //   getSupplier(_supplierController.text);
-                  //
-                  //   // await getItem();
-                  // }
+                  clearFiled();
                 },
                 decoration: InputDecoration(
                     prefixIcon: IconButton(
                       icon: const Icon(Icons.qr_code),
                       color: customTheme.Primary,
                       onPressed: () {
-                        // scanBarcode(context);
+                        scanBarcode(context).whenComplete(() async {
+                          if (_barcodeController.text.isNotEmpty) {
+                            _pOldItemPriceFocusNode.requestFocus();
+                            await getItem();
+                          }
+                        });
                       },
                     ),
                     prefixIconColor: customTheme.Primary,
@@ -142,11 +153,11 @@ class _PricingScreenState extends State<PricingScreen> {
                         ),
                         borderRadius: BorderRadius.circular(8.0))),
                 inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
+                  FilteringTextInputFormatter.allow(RegExp("[0-9]")),
                 ],
               ),
               FxSpacing.height(16),
-              (readOnlyBarcode)
+              (readOnly)
                   ? Container()
                   : ExpansionPanelList(
                       expandedHeaderPadding: const EdgeInsets.all(0),
@@ -311,33 +322,16 @@ class _PricingScreenState extends State<PricingScreen> {
                             isExpanded: _dataExpansionPanel[0]),
                       ],
                     ),
-              FxSpacing.height(16),
               FxTextField(
-                // controller: _quantityDestroyController,
+                controller: _pOldItemPriceController,
                 cursorColor: customTheme.Primary,
-                // readOnly: readOnlyQuantity,
+                readOnly: readOnly,
                 style: TextStyle(color: customTheme.Primary),
                 keyboardType: TextInputType.phone,
                 maxLines: 1,
                 onTap: () async {
-                  // if (_barcodeController.text.isEmpty) {
-                  //   setState(() {
-                  //     readOnlyQuantity = true;
-                  //   });
-                  //
-                  //   showTopSnackBar(
-                  //     Overlay.of(context),
-                  //     CustomSnackBar.error(
-                  //       message: 'p_e_barcode_no'.tr(),
-                  //     ),
-                  //   );
-                  // } else {
-                  //   setState(() {
-                  //     readOnlyQuantity = false;
-                  //   });
-                  //   await getItem();
-                  //   await returnCheck(branchNo, itemNo, supplierNo);
-                  // }
+                  validationField(
+                      _barcodeController.text, 'p_e_barcode_no', getItem());
                 },
                 decoration: InputDecoration(
                     prefixIcon: Icon(Icons.mode_edit_outlined,
@@ -375,46 +369,7 @@ class _PricingScreenState extends State<PricingScreen> {
               FxButton.medium(
                   borderRadiusAll: 8,
                   onPressed: () {
-                    // if (double.parse(_quantityReservedController.text) > 0) {
-                    //   AwesomeDialog(
-                    //       context: context,
-                    //       dialogType: DialogType.error,
-                    //       animType: AnimType.BOTTOMSLIDE,
-                    //       title: 'error'.tr(),
-                    //       desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
-                    //       btnOkText: 'ok'.tr(),
-                    //       btnOkOnPress: () {})
-                    //       .show();
-                    // } else if (double.parse(_quantityDestroyController.text) >
-                    //     quantityDestroy) {
-                    //   AwesomeDialog(
-                    //       context: context,
-                    //       dialogType: DialogType.error,
-                    //       animType: AnimType.BOTTOMSLIDE,
-                    //       title: 'error'.tr(),
-                    //       desc: 't_r_q_is_g_t_t_c_q'.tr(),
-                    //       btnOkText: 'ok'.tr(),
-                    //       btnOkOnPress: () {})
-                    //       .show();
-                    // } else {
-                    //   save(
-                    //       supplierNo.toString(),
-                    //       branchNo.toString(),
-                    //       itemNo.toString(),
-                    //       _barcodeController.text,
-                    //       itemEquivelentQty,
-                    //       _quantityDestroyController.text);
-                    // }
-                    //
-                    // setState(() {
-                    //   readOnlyBarcode = true;
-                    //   readOnlyQuantity = true;
-                    // });
-                    //
-                    // _supplierController.clear();
-                    // _barcodeController.clear();
-                    // _quantityDestroyController.clear();
-                    // _quantityReservedController.clear();
+                    validation();
                   },
                   backgroundColor: customTheme.Primary,
                   child: FxText.labelLarge(
@@ -427,5 +382,50 @@ class _PricingScreenState extends State<PricingScreen> {
         );
       },
     );
+  }
+
+  void validation() {
+    if (_barcodeController.text.isNotEmpty) {
+      // save(branchNo.toString(), itemNo.toString(), _barcodeController.text,
+      //     itemEquivelentQty, _quantityDestroyController.text);
+
+      //clear filed
+      clearFiled();
+    } else {
+      validationField(_barcodeController.text, 'p_e_barcode_no', getItem());
+    }
+  }
+
+  void validationField(String text, String alert, Future future) async {
+    if (text.isEmpty) {
+      setState(() {
+        readOnly = true;
+      });
+      showTopSnackBar(
+        Overlay.of(context),
+        CustomSnackBar.error(
+          message: alert.tr(),
+        ),
+      );
+
+      _barcodeFocusNode.requestFocus();
+    } else {
+      setState(() {
+        readOnly = false;
+      });
+
+      await future;
+    }
+  }
+
+  void clearFiled() {
+    _barcodeController.clear();
+    _pOldItemPriceController.clear();
+
+    _barcodeFocusNode.requestFocus();
+
+    setState(() {
+      readOnly = true;
+    });
   }
 }

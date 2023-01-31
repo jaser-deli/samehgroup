@@ -2,6 +2,7 @@ import 'package:provider/provider.dart';
 import 'package:samehgroup/extensions/string.dart';
 import 'package:samehgroup/screens/destroy_screen.dart';
 import 'package:samehgroup/screens/inventory_screen.dart';
+import 'package:samehgroup/screens/pricing_screen.dart';
 import 'package:samehgroup/screens/receiving_screen.dart';
 import 'package:samehgroup/screens/return_screen.dart';
 import 'package:samehgroup/screens/single_grid_item.dart';
@@ -38,11 +39,11 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: FxSpacing.fromLTRB(20, 0, 20, 20),
             child: ListView(
               shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               children: <Widget>[
                 GridView.count(
                     shrinkWrap: true,
-                    physics: ClampingScrollPhysics(),
+                    physics: const ClampingScrollPhysics(),
                     crossAxisCount: 2,
                     padding: FxSpacing.top(20),
                     mainAxisSpacing: 20,
@@ -53,37 +54,43 @@ class _HomeScreenState extends State<HomeScreen> {
                         iconColor: customTheme.Primary,
                         title: "destroy".tr(),
                         icon: './assets/icons/paper-shredder.png',
-                        navigation: DestroyScreen(),
+                        navigation: const DestroyScreen(),
                       ),
                       SinglePageItem(
                         iconColor: customTheme.Primary,
                         title: "returns".tr(),
                         icon: './assets/icons/refund.png',
-                        navigation: ReturnScreen(),
+                        navigation: const ReturnScreen(),
                       ),
                       SinglePageItem(
                         iconColor: customTheme.Primary,
                         title: "transfer_store".tr(),
                         icon: './assets/icons/transactions.png',
-                        navigation: TransferFromStore(),
+                        navigation: const TransferFromStore(),
                       ),
                       SinglePageItem(
                         iconColor: customTheme.Primary,
                         title: 'transfer_branch'.tr(),
                         icon: './assets/icons/transaction.png',
-                        navigation: TransferFromBranch(),
+                        navigation: const TransferFromBranch(),
                       ),
-                      // SinglePageItem(
-                      //   iconColor: customTheme.Primary,
-                      //   title: 'receiving'.tr(),
-                      //   icon: './assets/icons/box.png',
-                      //   navigation: ReceivingScreen(),
-                      // ),
+                      SinglePageItem(
+                        iconColor: customTheme.Primary,
+                        title: 'receiving'.tr(),
+                        icon: './assets/icons/box.png',
+                        navigation: const ReceivingScreen(),
+                      ),
+                      SinglePageItem(
+                        iconColor: customTheme.Primary,
+                        title: 'pricing'.tr(),
+                        icon: './assets/icons/barcode-scanner.png',
+                        navigation: const PricingScreen(),
+                      ),
                       SinglePageItem(
                         iconColor: customTheme.Primary,
                         title: 'inventory'.tr(),
                         icon: './assets/icons/inventory.png',
-                        navigation: InventoryScreen(),
+                        navigation: const InventoryScreen(),
                       ),
                     ]),
               ],

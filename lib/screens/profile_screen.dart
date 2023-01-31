@@ -121,7 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(50),
-                        child: Image(
+                        child: const Image(
                           image: AssetImage("./assets/images/logo.png"),
                           height: 100,
                           width: 100,
@@ -185,7 +185,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         showDialog(
                             context: context,
                             builder: (BuildContext context) =>
-                                SelectLanguageDialog());
+                                const SelectLanguageDialog());
                       },
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,
@@ -194,13 +194,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           FxContainer(
                             paddingAll: 12,
                             borderRadiusAll: 4,
+                            color: CustomTheme.peach.withAlpha(20),
                             child: Image(
                               height: 20,
                               width: 20,
                               image: AssetImage(Images.languageOutline),
                               color: CustomTheme.peach,
                             ),
-                            color: CustomTheme.peach.withAlpha(20),
                           ),
                           FxSpacing.width(16),
                           Expanded(
@@ -217,7 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ],
                       ),
                     ),
-                    Divider(
+                    const Divider(
                       thickness: 0.8,
                     ),
                     FxSpacing.height(16),
@@ -226,12 +226,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onPressed: () {
                         logout();
                       },
+                      elevation: 2,
+                      backgroundColor: customTheme.Primary,
                       child: FxText.labelLarge(
                         'logout'.tr(),
                         color: customTheme.OnPrimary,
                       ),
-                      elevation: 2,
-                      backgroundColor: customTheme.Primary,
                     ))
                   ],
                 )),

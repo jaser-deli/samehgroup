@@ -139,7 +139,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
         clearField();
 
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: 'p_c_t_b_n_e'.tr(),
           ),
@@ -165,7 +165,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
 
       if (responseBody["data"] == 1) {
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.success(
             message: 'o_a_s'.tr(),
           ),
@@ -191,7 +191,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
 
       if (responseBody["data"] == 1) {
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.success(
             message: 'q_c_s'.tr(),
           ),
@@ -273,7 +273,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                       onTap: () {
                         clearField();
                       },
-                      decoration: new InputDecoration(
+                      decoration: InputDecoration(
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                                 color: customTheme.Primary, width: 2.0),
@@ -295,7 +295,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           // labelText: "From",
-                          labelStyle: TextStyle(
+                          labelStyle: const TextStyle(
                             color: Color(0xFFB4B4B4),
                           ),
                           prefixIcon: Icon(
@@ -310,8 +310,8 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                       },
                       items: branches
                           .map((item) => DropdownMenuItem<String>(
-                                child: FxText.bodyMedium(item["branch_name_a"]),
                                 value: item["branch_no"],
+                                child: FxText.bodyMedium(item["branch_name_a"]),
                               ))
                           .toList()),
                 ),
@@ -331,7 +331,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                     });
 
                     showTopSnackBar(
-                      Overlay.of(context)!,
+                      Overlay.of(context),
                       CustomSnackBar.error(
                         message: 'الرجاء اختيار المستودع المحول منه'.tr(),
                       ),
@@ -344,7 +344,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                 },
                 decoration: InputDecoration(
                     prefixIcon: IconButton(
-                      icon: Icon(Icons.qr_code),
+                      icon: const Icon(Icons.qr_code),
                       color: customTheme.Primary,
                       onPressed: () {
                         scanBarcode(context);
@@ -406,7 +406,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                             ),
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 0.8,
                         ),
                         Row(
@@ -425,7 +425,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                             ),
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 0.8,
                         ),
                         Row(
@@ -444,7 +444,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                             ),
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 0.8,
                         ),
                       ],
@@ -464,7 +464,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                     });
 
                     showTopSnackBar(
-                      Overlay.of(context)!,
+                      Overlay.of(context),
                       CustomSnackBar.error(message: 'p_e_barcode_no'.tr()),
                     );
                   } else {
@@ -632,7 +632,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
     if (_barcodeController.text.isNotEmpty) {
       // if (double.parse(_quantityReservedController.text) > 0) {
       //   showTopSnackBar(
-      //     Overlay.of(context)!,
+      //     Overlay.of(context),
       //     CustomSnackBar.error(message: 't_i_is_p_a_p_a_or_c_t_t'.tr()),
       //   );
       // } else
@@ -640,7 +640,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
       if (double.parse(_quantityTransferController.text) >
           double.parse(_quantityCurrentController.text)) {
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: 'الكمية المحولة اكبر من الكمية الحاليه'.tr(),
           ),
@@ -664,7 +664,7 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
       });
 
       showTopSnackBar(
-        Overlay.of(context)!,
+        Overlay.of(context),
         CustomSnackBar.error(
           message: alert.tr(),
         ),

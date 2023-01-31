@@ -136,19 +136,19 @@ class _UpdateScreenState extends State<UpdateScreen> {
                 // crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('new_version'.tr(), style: theme.textTheme.subtitle1),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   (valuePercent > 1)
                       ? Container(
-                          padding: EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(10),
                           child: CircularPercentIndicator(
                             radius: 80.0,
                             lineWidth: 2.0,
                             percent: valuePercent / 100,
                             center: Text(
                               "$valuePercent%",
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black),

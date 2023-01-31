@@ -33,6 +33,7 @@ class _SelectLanguageDialogState extends State<SelectLanguageDialog> {
     Navigator.pop(context);
   }
 
+  @override
   Widget build(BuildContext context) {
     return Consumer<AppNotifier>(
       builder: (BuildContext context, AppNotifier value, Widget? child) {
@@ -41,7 +42,7 @@ class _SelectLanguageDialogState extends State<SelectLanguageDialog> {
         return Dialog(
           child: Container(
             color: FxAppTheme.theme.cardColor,
-            padding: EdgeInsets.only(top: 16, bottom: 16),
+            padding: const EdgeInsets.only(top: 16, bottom: 16),
             child: Column(
                 mainAxisSize: MainAxisSize.min, children: _buildOptions()),
           ),
@@ -59,7 +60,7 @@ class _SelectLanguageDialogState extends State<SelectLanguageDialog> {
           handleRadioValueChange(language);
         },
         child: Container(
-          padding: EdgeInsets.only(left: 16, right: 16),
+          padding: const EdgeInsets.only(left: 16, right: 16),
           child: Row(
             children: <Widget>[
               Radio<Language>(

@@ -227,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   FxSpacing.height(16),
                   Center(
                     child: (_isLoading)
-                        ? CircularProgressIndicator()
+                        ? const CircularProgressIndicator()
                         : FxButton.medium(
                             borderRadiusAll: 8,
                             onPressed: () {
@@ -277,7 +277,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (username.isEmpty) {
       showTopSnackBar(
-        Overlay.of(context)!,
+        Overlay.of(context),
         CustomSnackBar.error(
           message: 'p_e_username'.tr(),
         ),
@@ -287,7 +287,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (password.isEmpty) {
       showTopSnackBar(
-        Overlay.of(context)!,
+        Overlay.of(context),
         CustomSnackBar.error(
           message: 'p_e_password'.tr(),
         ),

@@ -102,7 +102,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
         clearFiled();
 
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: 'p_c_t_b_n_e'.tr(),
           ),
@@ -158,7 +158,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
 
       if (responseBody["data"] == 1) {
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: 'o_a_s'.tr(),
           ),
@@ -183,7 +183,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
 
       if (responseBody["data"] == 1) {
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.success(
             message: 'q_c_s'.tr(),
           ),
@@ -234,7 +234,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
             systemOverlayStyle: SystemUiOverlayStyle.light,
           ),
           body: ListView(
-            padding: FxSpacing.fromLTRB(24, 60, 24, 0),
+            padding: FxSpacing.fromLTRB(24, 30, 24, 0),
             children: [
               FxTextField(
                 controller: _barcodeController,
@@ -254,7 +254,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
                 },
                 decoration: InputDecoration(
                     prefixIcon: IconButton(
-                      icon: Icon(Icons.qr_code),
+                      icon: const Icon(Icons.qr_code),
                       color: customTheme.Primary,
                       onPressed: () {
                         scanBarcode(context).whenComplete(() async {
@@ -492,7 +492,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
     if (_barcodeController.text.isNotEmpty) {
       // if (double.parse(_quantityReservedController.text) > 0) {
       //   showTopSnackBar(
-      //     Overlay.of(context)!,
+      //     Overlay.of(context),
       //     CustomSnackBar.error(
       //       message: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
       //     ),
@@ -502,7 +502,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
       if (double.parse(_quantityDestroyController.text) >
           double.parse(quantityDestroy)) {
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: 't_d_q_is_g_t_t_c_q'.tr(),
           ),
@@ -525,7 +525,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
         readOnly = true;
       });
       showTopSnackBar(
-        Overlay.of(context)!,
+        Overlay.of(context),
         CustomSnackBar.error(
           message: alert.tr(),
         ),

@@ -87,7 +87,7 @@ class _SelectLanguageScreenState extends State<SelectLanguageScreen> {
                   // crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      margin: EdgeInsets.only(right: 25),
+                      margin: const EdgeInsets.only(right: 25),
                       // padding: const EdgeInsetsDirectional.only(end: 25),
                       child: Icon(
                         FontAwesomeIcons.language,

@@ -62,7 +62,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return ListView.builder(
-                  padding: EdgeInsets.only(top: 10),
+                  padding: const EdgeInsets.only(top: 10),
                   itemCount: (snapshot.data as List).length,
                   itemBuilder: (context, index) {
                     return Column(

@@ -52,7 +52,7 @@ class SingleGridItem extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: customTheme.card,
-          borderRadius: BorderRadius.all(Radius.circular(4.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(4.0)),
           border: Border.all(width: 1.2, color: customTheme.border),
         ),
         child: Center(
@@ -61,7 +61,7 @@ class SingleGridItem extends StatelessWidget {
             children: <Widget>[
               iconWidget,
               Container(
-                margin: EdgeInsets.only(top: 16),
+                margin: const EdgeInsets.only(top: 16),
                 child: FxText.bodyLarge(
                   title,
                   fontWeight: 600,
@@ -132,7 +132,7 @@ class SinglePageItem extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: backgroundColor ?? AppTheme.customTheme.card,
-          borderRadius: BorderRadius.all(Radius.circular(4.0)),
+          borderRadius: const BorderRadius.all(Radius.circular(4.0)),
           border: Border.all(
               width: 1.2, color: borderColor ?? AppTheme.customTheme.border),
         ),
@@ -142,7 +142,7 @@ class SinglePageItem extends StatelessWidget {
             children: <Widget>[
               iconWidget,
               Container(
-                margin: EdgeInsets.only(top: 16),
+                margin: const EdgeInsets.only(top: 16),
                 child:
                     FxText.bodyMedium(title!, fontWeight: 600, color: textColor, textAlign: TextAlign.center,),
               )
@@ -191,32 +191,30 @@ class _SinglePageHomeState extends State<SinglePageHome> {
           ),
         ),
       ),
-      body: Container(
-        child: ListView(
-          shrinkWrap: true,
-          physics: ClampingScrollPhysics(),
-          children: [
-            GridView.count(
-              crossAxisCount: 2,
-              physics: ClampingScrollPhysics(),
-              shrinkWrap: true,
-              padding: FxSpacing.fromLTRB(20, 0, 20, 20),
-              mainAxisSpacing: 20,
-              childAspectRatio: 3 / 2,
-              crossAxisSpacing: 20,
-              children: widget.items,
-            ),
-            widget.isComingSoon
-                ? Container(
-                    margin: FxSpacing.top(8),
-                    child: Center(
-                      child: FxText.titleSmall(widget.comingSoonText,
-                          color: themeData.colorScheme.onBackground,
-                          fontWeight: 500),
-                    ))
-                : Container()
-          ],
-        ),
+      body: ListView(
+        shrinkWrap: true,
+        physics: const ClampingScrollPhysics(),
+        children: [
+          GridView.count(
+            crossAxisCount: 2,
+            physics: const ClampingScrollPhysics(),
+            shrinkWrap: true,
+            padding: FxSpacing.fromLTRB(20, 0, 20, 20),
+            mainAxisSpacing: 20,
+            childAspectRatio: 3 / 2,
+            crossAxisSpacing: 20,
+            children: widget.items,
+          ),
+          widget.isComingSoon
+              ? Container(
+                  margin: FxSpacing.top(8),
+                  child: Center(
+                    child: FxText.titleSmall(widget.comingSoonText,
+                        color: themeData.colorScheme.onBackground,
+                        fontWeight: 500),
+                  ))
+              : Container()
+        ],
       ),
     );
   }

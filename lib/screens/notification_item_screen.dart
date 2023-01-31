@@ -100,23 +100,21 @@ class _NotificationItemScreenState extends State<NotificationItemScreen> {
         ),
         body: Container(
           color: theme.backgroundColor,
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             children: <Widget>[
-              Container(
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                        flex: 1,
-                        child: Center(
-                            child: FxText.titleMedium("${widget.title}",
-                                fontWeight: 600))),
-                  ],
-                ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                      flex: 1,
+                      child: Center(
+                          child: FxText.titleMedium("${widget.title}",
+                              fontWeight: 600))),
+                ],
               ),
-              Divider(),
+              const Divider(),
               Container(
-                margin: EdgeInsets.only(top: 24),
+                margin: const EdgeInsets.only(top: 24),
                 child: FxText.bodyMedium("${widget.message}", fontWeight: 500),
               ),
             ],

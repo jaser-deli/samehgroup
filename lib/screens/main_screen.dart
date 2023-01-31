@@ -110,7 +110,7 @@ class _MainScreenState extends State<MainScreen> {
                   setState(() => currentIndex = index);
                   setState(() {});
                 },
-                children: <Widget>[
+                children: const <Widget>[
                   HomeScreen(),
                   NotificationScreen(),
                   ProfileScreen()

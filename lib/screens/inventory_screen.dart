@@ -83,7 +83,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
         clearFiled();
 
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: 'p_c_t_b_n_e'.tr(),
           ),
@@ -118,7 +118,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
       if (responseBody["data"] == 1) {
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.success(
             message: 'o_a_s'.tr(),
           ),
@@ -140,7 +140,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
       if (responseBody["data"] == 1) {
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.success(
             message: 'q_c_s'.tr(),
           ),
@@ -191,7 +191,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
             systemOverlayStyle: SystemUiOverlayStyle.light,
           ),
           body: ListView(
-            padding: FxSpacing.fromLTRB(24, 60, 24, 0),
+            padding: FxSpacing.fromLTRB(24, 30, 24, 0),
             children: [
               FxTextField(
                 controller: _barcodeController,
@@ -206,7 +206,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 },
                 decoration: InputDecoration(
                     prefixIcon: IconButton(
-                      icon: Icon(Icons.qr_code),
+                      icon: const Icon(Icons.qr_code),
                       color: customTheme.Primary,
                       onPressed: () {
                         // Scan Barcode
@@ -269,7 +269,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             ),
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 0.8,
                         ),
                         Row(
@@ -288,7 +288,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             ),
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 0.8,
                         ),
                         Row(
@@ -307,7 +307,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             ),
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 0.8,
                         ),
                       ],
@@ -447,7 +447,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       });
 
       showTopSnackBar(
-        Overlay.of(context)!,
+        Overlay.of(context),
         CustomSnackBar.error(
           message: alert.tr(),
         ),

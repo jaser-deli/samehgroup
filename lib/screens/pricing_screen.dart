@@ -17,9 +17,16 @@ class _PricingScreenState extends State<PricingScreen> {
   late CustomTheme customTheme;
   late ThemeData theme;
 
+  final List<bool> _dataExpansionPanel = [true];
+
+  late TextEditingController _barcodeController;
+
+  bool readOnlyBarcode = false;
+
   @override
   void initState() {
     super.initState();
+    _barcodeController = TextEditingController();
 
     customTheme = AppTheme.customTheme;
     theme = AppTheme.theme;
@@ -31,7 +38,7 @@ class _PricingScreenState extends State<PricingScreen> {
       builder: (BuildContext context, AppNotifier value, Widget? child) {
         return Scaffold(
           appBar: AppBar(
-            title: FxText.headlineSmall('receiving'.tr(),
+            title: FxText.headlineSmall('pricing'.tr(),
                 color: FxAppTheme.theme.primaryColor, fontWeight: 500),
             backgroundColor: Colors.transparent,
             leading: Container(
@@ -67,90 +74,12 @@ class _PricingScreenState extends State<PricingScreen> {
             systemOverlayStyle: SystemUiOverlayStyle.light,
           ),
           body: ListView(
-            padding: FxSpacing.fromLTRB(24, 60, 24, 0),
+            padding: FxSpacing.fromLTRB(24, 30, 24, 0),
             children: [
-              // FxTextField(
-              //   controller: _orderController,
-              //   cursorColor: customTheme.Primary,
-              //   readOnly: false,
-              //   style: TextStyle(color: customTheme.Primary),
-              //   keyboardType: TextInputType.phone,
-              //   maxLines: 1,
-              //   onTap: () {
-              //     // _supplierController.clear();
-              //     // _barcodeController.clear();
-              //     // _quantityDestroyController.clear();
-              //     // _quantityReservedController.clear();
-              //     //
-              //     // setState(() {
-              //     //   readOnlyBarcode = true;
-              //     //   readOnlyQuantity = true;
-              //     // });
-              //   },
-              //   decoration: InputDecoration(
-              //       prefixIcon: Icon(
-              //         Icons.person_outline,
-              //         color: customTheme.Primary,
-              //       ),
-              //       prefixIconColor: customTheme.Primary,
-              //       hintText: 'order'.tr(),
-              //       hintStyle: TextStyle(color: customTheme.Primary),
-              //       fillColor: customTheme.Primary.withAlpha(40),
-              //       filled: true,
-              //       floatingLabelBehavior: FloatingLabelBehavior.always,
-              //       counter: const Offstage(),
-              //       focusedBorder: OutlineInputBorder(
-              //           borderSide: BorderSide(
-              //             color: customTheme.Primary,
-              //             width: 1.0,
-              //           ),
-              //           borderRadius: BorderRadius.circular(8.0)),
-              //       enabledBorder: OutlineInputBorder(
-              //           borderSide: const BorderSide(
-              //             color: Colors.transparent,
-              //             width: 1.0,
-              //           ),
-              //           borderRadius: BorderRadius.circular(8.0)),
-              //       border: OutlineInputBorder(
-              //           borderSide: BorderSide(
-              //             color: customTheme.Primary,
-              //             width: 1.0,
-              //           ),
-              //           borderRadius: BorderRadius.circular(8.0))),
-              //   inputFormatters: <TextInputFormatter>[
-              //     FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
-              //   ],
-              // ),
-              // (readOnlyBarcode)
-              //     ? Container()
-              //     : FxContainer(
-              //     child: Column(
-              //       crossAxisAlignment: CrossAxisAlignment.start,
-              //       children: [
-              //         FxText.titleMedium(
-              //           'information_supplier'.tr(),
-              //           fontWeight: 700,
-              //         ),
-              //         FxSpacing.height(8),
-              //         Row(
-              //           children: [
-              //             Expanded(
-              //               child: FxText.bodyLarge(
-              //                 "supplierName",
-              //               ),
-              //             ),
-              //           ],
-              //         ),
-              //         Divider(
-              //           thickness: 0.8,
-              //         ),
-              //       ],
-              //     )),
-              FxSpacing.height(24),
               FxTextField(
-                // controller: _barcodeController,
+                controller: _barcodeController,
                 cursorColor: customTheme.Primary,
-                // readOnly: readOnlyBarcode,
+                readOnly: false,
                 style: TextStyle(color: customTheme.Primary),
                 keyboardType: TextInputType.phone,
                 maxLines: 1,
@@ -181,7 +110,7 @@ class _PricingScreenState extends State<PricingScreen> {
                 },
                 decoration: InputDecoration(
                     prefixIcon: IconButton(
-                      icon: Icon(Icons.qr_code),
+                      icon: const Icon(Icons.qr_code),
                       color: customTheme.Primary,
                       onPressed: () {
                         // scanBarcode(context);
@@ -216,218 +145,232 @@ class _PricingScreenState extends State<PricingScreen> {
                   FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
                 ],
               ),
-              // (readOnlyQuantity)
-              //     ? Container()
-              //     : FxContainer(
-              //     child: Column(
-              //       crossAxisAlignment: CrossAxisAlignment.start,
-              //       children: [
-              //         FxText.titleMedium(
-              //           'information_item'.tr(),
-              //           fontWeight: 700,
-              //         ),
-              //         FxSpacing.height(8),
-              //         Row(
-              //           children: [
-              //             FxContainer(
-              //               paddingAll: 12,
-              //               borderRadiusAll: 4,
-              //               child: Text('item_no'.tr()),
-              //               color: CustomTheme.peach.withAlpha(20),
-              //             ),
-              //             FxSpacing.width(16),
-              //             Expanded(
-              //               child: FxText.bodyLarge(
-              //                 "itemNo",
-              //               ),
-              //             ),
-              //           ],
-              //         ),
-              //         Divider(
-              //           thickness: 0.8,
-              //         ),
-              //         Row(
-              //           children: [
-              //             FxContainer(
-              //               paddingAll: 12,
-              //               borderRadiusAll: 4,
-              //               child: Text('item_name'.tr()),
-              //               color: CustomTheme.peach.withAlpha(20),
-              //             ),
-              //             FxSpacing.width(16),
-              //             Expanded(
-              //               child: FxText.bodyLarge(
-              //                 "itemName",
-              //               ),
-              //             ),
-              //           ],
-              //         ),
-              //         Divider(
-              //           thickness: 0.8,
-              //         ),
-              //         Row(
-              //           children: [
-              //             FxContainer(
-              //               paddingAll: 12,
-              //               borderRadiusAll: 4,
-              //               child: Text('packing'.tr()),
-              //               color: CustomTheme.peach.withAlpha(20),
-              //             ),
-              //             FxSpacing.width(16),
-              //             Expanded(
-              //               child: FxText.bodyLarge(
-              //                 "itemEquivelentQty",
-              //               ),
-              //             ),
-              //           ],
-              //         ),
-              //         Divider(
-              //           thickness: 0.8,
-              //         ),
-              //       ],
-              //     )),
-              FxSpacing.height(24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Container(
-                    width: 140,
-                    child: FxTextField(
-                      // controller: _quantityDestroyController,
-                      cursorColor: customTheme.Primary,
-                      // readOnly: readOnlyQuantity,
-                      style: TextStyle(color: customTheme.Primary),
-                      keyboardType: TextInputType.phone,
-                      maxLines: 1,
-                      onTap: () async {
-                        // if (_barcodeController.text.isEmpty) {
-                        //   setState(() {
-                        //     readOnlyQuantity = true;
-                        //   });
-                        //
-                        //   AwesomeDialog(
-                        //       context: context,
-                        //       dialogType: DialogType.error,
-                        //       animType: AnimType.BOTTOMSLIDE,
-                        //       title: 'error'.tr(),
-                        //       desc: 'p_e_barcode_no'.tr(),
-                        //       btnOkText: 'ok'.tr(),
-                        //       btnOkOnPress: () {})
-                        //       .show();
-                        // } else {
-                        //   setState(() {
-                        //     readOnlyQuantity = false;
-                        //   });
-                        //   await getItem();
-                        //   await returnCheck(branchNo, itemNo, supplierNo);
-                        // }
+              FxSpacing.height(16),
+              (readOnlyBarcode)
+                  ? Container()
+                  : ExpansionPanelList(
+                      expandedHeaderPadding: const EdgeInsets.all(0),
+                      expansionCallback: (int index, bool isExpanded) {
+                        setState(() {
+                          _dataExpansionPanel[index] = !isExpanded;
+                        });
                       },
-                      decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.production_quantity_limits,
-                              color: customTheme.Primary),
-                          prefixIconColor: customTheme.Primary,
-                          hintText: 'الكمية'.tr(),
-                          hintStyle: TextStyle(color: customTheme.Primary),
-                          fillColor: customTheme.Primary.withAlpha(40),
-                          filled: true,
-                          floatingLabelBehavior: FloatingLabelBehavior.always,
-                          counter: const Offstage(),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: customTheme.Primary,
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(8.0)),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.transparent,
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(8.0)),
-                          border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: customTheme.Primary,
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(8.0))),
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(
-                            RegExp("[0-9a-zA-Z]")),
+                      animationDuration: const Duration(milliseconds: 500),
+                      children: <ExpansionPanel>[
+                        ExpansionPanel(
+                            canTapOnHeader: true,
+                            headerBuilder:
+                                (BuildContext context, bool isExpanded) {
+                              return Container(
+                                padding: FxSpacing.all(16),
+                                child: FxText.titleMedium(
+                                    'information_item'.tr(),
+                                    fontWeight: isExpanded ? 700 : 600,
+                                    letterSpacing: 0),
+                              );
+                            },
+                            body: FxContainer(
+                                child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    FxContainer(
+                                      paddingAll: 12,
+                                      borderRadiusAll: 4,
+                                      color: CustomTheme.peach.withAlpha(20),
+                                      child: Text('item_no'.tr()),
+                                    ),
+                                    FxSpacing.width(16),
+                                    Expanded(
+                                      child: FxText.bodyLarge(
+                                        "itemNo",
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Divider(
+                                  thickness: 0.8,
+                                ),
+                                Row(
+                                  children: [
+                                    FxContainer(
+                                      paddingAll: 12,
+                                      borderRadiusAll: 4,
+                                      color: CustomTheme.peach.withAlpha(20),
+                                      child: Text('item_name'.tr()),
+                                    ),
+                                    FxSpacing.width(16),
+                                    Expanded(
+                                      child: FxText.bodyLarge(
+                                        "itemName",
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Divider(
+                                  thickness: 0.8,
+                                ),
+                                Row(
+                                  children: [
+                                    FxContainer(
+                                      paddingAll: 12,
+                                      borderRadiusAll: 4,
+                                      color: CustomTheme.peach.withAlpha(20),
+                                      child: Text('packing'.tr()),
+                                    ),
+                                    FxSpacing.width(16),
+                                    Expanded(
+                                      child: FxText.bodyLarge(
+                                        "itemEquivelentQty",
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Divider(
+                                  thickness: 0.8,
+                                ),
+                                Row(
+                                  children: [
+                                    FxContainer(
+                                      paddingAll: 12,
+                                      borderRadiusAll: 4,
+                                      color: CustomTheme.peach.withAlpha(20),
+                                      child: Text('price'.tr()),
+                                    ),
+                                    FxSpacing.width(16),
+                                    Expanded(
+                                      child: FxText.bodyLarge(
+                                        "price",
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Divider(
+                                  thickness: 0.8,
+                                ),
+                                Row(
+                                  children: [
+                                    FxContainer(
+                                      paddingAll: 12,
+                                      borderRadiusAll: 4,
+                                      color: CustomTheme.peach.withAlpha(20),
+                                      child: Text('ملاحظات عرض النورمال'.tr()),
+                                    ),
+                                    FxSpacing.width(16),
+                                    Expanded(
+                                      child: FxText.bodyLarge(
+                                        "price",
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Divider(
+                                  thickness: 0.8,
+                                ),
+                                Row(
+                                  children: [
+                                    FxContainer(
+                                      paddingAll: 12,
+                                      borderRadiusAll: 4,
+                                      color: CustomTheme.peach.withAlpha(20),
+                                      child: Text('ملاحظات عرض MIX'.tr()),
+                                    ),
+                                    FxSpacing.width(16),
+                                    Expanded(
+                                      child: FxText.bodyLarge(
+                                        "price",
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Divider(
+                                  thickness: 0.8,
+                                ),
+                                Row(
+                                  children: [
+                                    FxContainer(
+                                      paddingAll: 12,
+                                      borderRadiusAll: 4,
+                                      color: CustomTheme.peach.withAlpha(20),
+                                      child: Text('ملاحظات عرض SET'.tr()),
+                                    ),
+                                    FxSpacing.width(16),
+                                    Expanded(
+                                      child: FxText.bodyLarge(
+                                        "price",
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Divider(
+                                  thickness: 0.8,
+                                ),
+                              ],
+                            )),
+                            isExpanded: _dataExpansionPanel[0]),
                       ],
                     ),
-                  ),
-                  Container(
-                    width: 140,
-                    child: FxTextField(
-                      // controller: _quantityDestroyController,
-                      cursorColor: customTheme.Primary,
-                      // readOnly: readOnlyQuantity,
-                      style: TextStyle(color: customTheme.Primary),
-                      keyboardType: TextInputType.phone,
-                      maxLines: 1,
-                      onTap: () async {
-                        // if (_barcodeController.text.isEmpty) {
-                        //   setState(() {
-                        //     readOnlyQuantity = true;
-                        //   });
-                        //
-                        //   AwesomeDialog(
-                        //       context: context,
-                        //       dialogType: DialogType.error,
-                        //       animType: AnimType.BOTTOMSLIDE,
-                        //       title: 'error'.tr(),
-                        //       desc: 'p_e_barcode_no'.tr(),
-                        //       btnOkText: 'ok'.tr(),
-                        //       btnOkOnPress: () {})
-                        //       .show();
-                        // } else {
-                        //   setState(() {
-                        //     readOnlyQuantity = false;
-                        //   });
-                        //   await getItem();
-                        //   await returnCheck(branchNo, itemNo, supplierNo);
-                        // }
-                      },
-                      decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.payments_outlined,
-                              color: customTheme.Primary),
-                          prefixIconColor: customTheme.Primary,
-                          hintText: 'السعر'.tr(),
-                          hintStyle: TextStyle(color: customTheme.Primary),
-                          fillColor: customTheme.Primary.withAlpha(40),
-                          filled: true,
-                          floatingLabelBehavior: FloatingLabelBehavior.always,
-                          counter: const Offstage(),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: customTheme.Primary,
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(8.0)),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.transparent,
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(8.0)),
-                          border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: customTheme.Primary,
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(8.0))),
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(
-                            RegExp("[0-9a-zA-Z]")),
-                      ],
-                    ),
-                  ),
+              FxSpacing.height(16),
+              FxTextField(
+                // controller: _quantityDestroyController,
+                cursorColor: customTheme.Primary,
+                // readOnly: readOnlyQuantity,
+                style: TextStyle(color: customTheme.Primary),
+                keyboardType: TextInputType.phone,
+                maxLines: 1,
+                onTap: () async {
+                  // if (_barcodeController.text.isEmpty) {
+                  //   setState(() {
+                  //     readOnlyQuantity = true;
+                  //   });
+                  //
+                  //   showTopSnackBar(
+                  //     Overlay.of(context),
+                  //     CustomSnackBar.error(
+                  //       message: 'p_e_barcode_no'.tr(),
+                  //     ),
+                  //   );
+                  // } else {
+                  //   setState(() {
+                  //     readOnlyQuantity = false;
+                  //   });
+                  //   await getItem();
+                  //   await returnCheck(branchNo, itemNo, supplierNo);
+                  // }
+                },
+                decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.mode_edit_outlined,
+                        color: customTheme.Primary),
+                    prefixIconColor: customTheme.Primary,
+                    hintText: 'تسجيل سعر الرف'.tr(),
+                    hintStyle: TextStyle(color: customTheme.Primary),
+                    fillColor: customTheme.Primary.withAlpha(40),
+                    filled: true,
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    counter: const Offstage(),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: customTheme.Primary,
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0)),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: Colors.transparent,
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0)),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: customTheme.Primary,
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0))),
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
-
-              FxSpacing.height(24),
-
               FxSpacing.height(16),
               FxButton.medium(
                   borderRadiusAll: 8,
@@ -475,9 +418,10 @@ class _PricingScreenState extends State<PricingScreen> {
                   },
                   backgroundColor: customTheme.Primary,
                   child: FxText.labelLarge(
-                    "save".tr(),
+                    "print".tr(),
                     color: customTheme.OnPrimary,
                   )),
+              FxSpacing.height(16),
             ],
           ),
         );

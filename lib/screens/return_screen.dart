@@ -74,9 +74,9 @@ class _ReturnScreenState extends State<ReturnScreen> {
   }
 
   Future getSupplier(
-    String _supplierNo,
+    String supplierNo,
   ) async {
-    var response = await http.get(Uri.parse("${Api.supplier}/$_supplierNo"));
+    var response = await http.get(Uri.parse("${Api.supplier}/$supplierNo"));
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
 
@@ -128,7 +128,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
         clearFiled();
 
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: 'p_c_t_b_n_e'.tr(),
           ),
@@ -148,7 +148,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
         clearFiled();
 
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: 't_b_is_n_r_on_t_r'.tr(),
           ),
@@ -157,7 +157,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
         clearFiled();
 
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: 't_b_is_n_r_on_t_b'.tr(),
           ),
@@ -218,7 +218,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
 
       if (responseBody["data"] == 1) {
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.success(
             message: 'o_a_s'.tr(),
           ),
@@ -244,7 +244,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
 
       if (responseBody["data"] == 1) {
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.success(
             message: 'q_c_s'.tr(),
           ),
@@ -295,7 +295,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
             systemOverlayStyle: SystemUiOverlayStyle.light,
           ),
           body: ListView(
-            padding: FxSpacing.fromLTRB(24, 60, 24, 0),
+            padding: FxSpacing.fromLTRB(24, 30, 24, 0),
             children: [
               FxTextField(
                 controller: _supplierController,
@@ -367,7 +367,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                             ),
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 0.8,
                         ),
                       ],
@@ -386,7 +386,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                 },
                 decoration: InputDecoration(
                     prefixIcon: IconButton(
-                      icon: Icon(Icons.qr_code),
+                      icon: const Icon(Icons.qr_code),
                       color: customTheme.Primary,
                       onPressed: () {
                         scanBarcode(context);
@@ -437,8 +437,8 @@ class _ReturnScreenState extends State<ReturnScreen> {
                             FxContainer(
                               paddingAll: 12,
                               borderRadiusAll: 4,
-                              child: Text('item_no'.tr()),
                               color: CustomTheme.peach.withAlpha(20),
+                              child: Text('item_no'.tr()),
                             ),
                             FxSpacing.width(16),
                             Expanded(
@@ -448,7 +448,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                             ),
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 0.8,
                         ),
                         Row(
@@ -456,8 +456,8 @@ class _ReturnScreenState extends State<ReturnScreen> {
                             FxContainer(
                               paddingAll: 12,
                               borderRadiusAll: 4,
-                              child: Text('item_name'.tr()),
                               color: CustomTheme.peach.withAlpha(20),
+                              child: Text('item_name'.tr()),
                             ),
                             FxSpacing.width(16),
                             Expanded(
@@ -467,7 +467,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                             ),
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 0.8,
                         ),
                         Row(
@@ -475,8 +475,8 @@ class _ReturnScreenState extends State<ReturnScreen> {
                             FxContainer(
                               paddingAll: 12,
                               borderRadiusAll: 4,
-                              child: Text('packing'.tr()),
                               color: CustomTheme.peach.withAlpha(20),
+                              child: Text('packing'.tr()),
                             ),
                             FxSpacing.width(16),
                             Expanded(
@@ -486,7 +486,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                             ),
                           ],
                         ),
-                        Divider(
+                        const Divider(
                           thickness: 0.8,
                         ),
                       ],
@@ -506,7 +506,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                     });
 
                     showTopSnackBar(
-                      Overlay.of(context)!,
+                      Overlay.of(context),
                       CustomSnackBar.error(
                         message: 'p_e_barcode_no'.tr(),
                       ),
@@ -635,7 +635,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
     if (_barcodeController.text.isNotEmpty) {
       // if (double.parse(_quantityReservedController.text) > 0) {
       //   showTopSnackBar(
-      //     Overlay.of(context)!,
+      //     Overlay.of(context),
       //     CustomSnackBar.error(
       //       message: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
       //     ),
@@ -644,7 +644,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
 
       if (double.parse(_quantityDestroyController.text) > quantityDestroy) {
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: 't_r_q_is_g_t_t_c_q'.tr(),
           ),
@@ -673,7 +673,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
       });
 
       showTopSnackBar(
-        Overlay.of(context)!,
+        Overlay.of(context),
         CustomSnackBar.error(
           message: alert.tr(),
         ),

@@ -86,6 +86,8 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
               }
             }),
         floatingActionButton: FloatingActionButton(
+          onPressed: () => cameraController.toggleTorch(),
+          backgroundColor: customTheme.Primary,
           child: ValueListenableBuilder(
             valueListenable: cameraController.torchState,
             builder: (context, state, child) {
@@ -97,8 +99,6 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
               }
             },
           ),
-          onPressed: () => cameraController.toggleTorch(),
-          backgroundColor: customTheme.Primary,
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       );

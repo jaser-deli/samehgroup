@@ -88,7 +88,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
             systemOverlayStyle: SystemUiOverlayStyle.light,
           ),
           body: ListView(
-            padding: FxSpacing.fromLTRB(24, 60, 24, 0),
+            padding: FxSpacing.fromLTRB(24, 30, 24, 0),
             children: [
               FxTextField(
                 controller: _orderController,
@@ -202,7 +202,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                 },
                 decoration: InputDecoration(
                     prefixIcon: IconButton(
-                      icon: Icon(Icons.qr_code),
+                      icon: const Icon(Icons.qr_code),
                       color: customTheme.Primary,
                       onPressed: () {
                         // scanBarcode(context);

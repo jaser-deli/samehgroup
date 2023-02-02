@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/screens/barcode_scanner_screen.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
@@ -8,6 +11,7 @@ import 'package:flutx/flutx.dart';
 import 'package:samehgroup/extensions/string.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
+import 'package:http/http.dart' as http;
 
 class PricingScreen extends StatefulWidget {
   const PricingScreen({Key? key}) : super(key: key);
@@ -20,7 +24,7 @@ class _PricingScreenState extends State<PricingScreen> {
   late CustomTheme customTheme;
   late ThemeData theme;
 
-  final List<bool> _dataExpansionPanel = [true];
+  final List<bool> _dataExpansionPanel = [true, true];
 
   late TextEditingController _barcodeController;
   late TextEditingController _pOldItemPriceController;
@@ -29,6 +33,10 @@ class _PricingScreenState extends State<PricingScreen> {
   late FocusNode _pOldItemPriceFocusNode;
 
   bool readOnly = true;
+
+  String itemNo = "";
+  String itemName = "";
+  String itemEquivelentQty = "";
 
   @override
   void initState() {
@@ -41,6 +49,51 @@ class _PricingScreenState extends State<PricingScreen> {
 
     customTheme = AppTheme.customTheme;
     theme = AppTheme.theme;
+  }
+
+  Future<void> getItem() async {
+    var response =
+        await http.get(Uri.parse("${Api.pricing}/${_barcodeController.text}"));
+    if (response.statusCode == 200) {
+      var responseBody = json.decode(response.body);
+
+      if (responseBody["data"] != null) {
+
+        // wait get Quantity Destroy
+        // await getQuantityDestroy(
+        //     responseBody["data"]["branch_no"], responseBody["data"]["item_no"]);
+
+        setState(() {
+          itemNo = responseBody["data"]["item_no"];
+          itemName = responseBody["data"]["item_name"];
+          itemEquivelentQty = responseBody["data"]["itm_equivelent_qty"];
+        });
+      } else {
+        clearFiled();
+
+        showTopSnackBar(
+          Overlay.of(context),
+          CustomSnackBar.error(
+            message: 'p_c_t_b_n_e'.tr(),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> getQuantityDestroy(
+    String branchNo,
+    String itemNo,
+  ) async {
+    var response =
+        await http.get(Uri.parse("${Api.quantityDestroy}/$branchNo/$itemNo"));
+    if (response.statusCode == 200) {
+      var responseBody = json.decode(response.body);
+
+      setState(() {
+        // quantityDestroy = responseBody["data"][0]["quantity_destroy"];
+      });
+    }
   }
 
   Future<void> scanBarcode(BuildContext context) async {
@@ -159,168 +212,191 @@ class _PricingScreenState extends State<PricingScreen> {
               FxSpacing.height(16),
               (readOnly)
                   ? Container()
-                  : ExpansionPanelList(
-                      expandedHeaderPadding: const EdgeInsets.all(0),
-                      expansionCallback: (int index, bool isExpanded) {
-                        setState(() {
-                          _dataExpansionPanel[index] = !isExpanded;
-                        });
-                      },
-                      animationDuration: const Duration(milliseconds: 500),
-                      children: <ExpansionPanel>[
-                        ExpansionPanel(
-                            canTapOnHeader: true,
-                            headerBuilder:
-                                (BuildContext context, bool isExpanded) {
-                              return Container(
-                                padding: FxSpacing.all(16),
-                                child: FxText.titleMedium(
-                                    'information_item'.tr(),
-                                    fontWeight: isExpanded ? 700 : 600,
-                                    letterSpacing: 0),
-                              );
-                            },
-                            body: FxContainer(
-                                child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    FxContainer(
-                                      paddingAll: 12,
-                                      borderRadiusAll: 4,
-                                      color: CustomTheme.peach.withAlpha(20),
-                                      child: Text('item_no'.tr()),
-                                    ),
-                                    FxSpacing.width(16),
-                                    Expanded(
-                                      child: FxText.bodyLarge(
-                                        "itemNo",
+                  : Container(
+                      padding: FxSpacing.only(bottom: 16),
+                      child: ExpansionPanelList(
+                        expandedHeaderPadding: const EdgeInsets.all(0),
+                        expansionCallback: (int index, bool isExpanded) {
+                          setState(() {
+                            _dataExpansionPanel[index] = !isExpanded;
+                          });
+                        },
+                        animationDuration: const Duration(milliseconds: 500),
+                        children: <ExpansionPanel>[
+                          ExpansionPanel(
+                              canTapOnHeader: true,
+                              headerBuilder:
+                                  (BuildContext context, bool isExpanded) {
+                                return Container(
+                                  padding: FxSpacing.all(16),
+                                  child: FxText.titleMedium(
+                                      'information_item'.tr(),
+                                      fontWeight: isExpanded ? 700 : 600,
+                                      letterSpacing: 0),
+                                );
+                              },
+                              body: FxContainer(
+                                  child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      FxContainer(
+                                        paddingAll: 12,
+                                        borderRadiusAll: 4,
+                                        color: CustomTheme.peach.withAlpha(20),
+                                        child: Text('item_no'.tr()),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const Divider(
-                                  thickness: 0.8,
-                                ),
-                                Row(
-                                  children: [
-                                    FxContainer(
-                                      paddingAll: 12,
-                                      borderRadiusAll: 4,
-                                      color: CustomTheme.peach.withAlpha(20),
-                                      child: Text('item_name'.tr()),
-                                    ),
-                                    FxSpacing.width(16),
-                                    Expanded(
-                                      child: FxText.bodyLarge(
-                                        "itemName",
+                                      FxSpacing.width(16),
+                                      Expanded(
+                                        child: FxText.bodyLarge(
+                                          itemNo,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const Divider(
-                                  thickness: 0.8,
-                                ),
-                                Row(
-                                  children: [
-                                    FxContainer(
-                                      paddingAll: 12,
-                                      borderRadiusAll: 4,
-                                      color: CustomTheme.peach.withAlpha(20),
-                                      child: Text('packing'.tr()),
-                                    ),
-                                    FxSpacing.width(16),
-                                    Expanded(
-                                      child: FxText.bodyLarge(
-                                        "itemEquivelentQty",
+                                    ],
+                                  ),
+                                  const Divider(
+                                    thickness: 0.8,
+                                  ),
+                                  Row(
+                                    children: [
+                                      FxContainer(
+                                        paddingAll: 12,
+                                        borderRadiusAll: 4,
+                                        color: CustomTheme.peach.withAlpha(20),
+                                        child: Text('item_name'.tr()),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const Divider(
-                                  thickness: 0.8,
-                                ),
-                                Row(
-                                  children: [
-                                    FxContainer(
-                                      paddingAll: 12,
-                                      borderRadiusAll: 4,
-                                      color: CustomTheme.peach.withAlpha(20),
-                                      child: Text('price'.tr()),
-                                    ),
-                                    FxSpacing.width(16),
-                                    Expanded(
-                                      child: FxText.bodyLarge(
-                                        "price",
+                                      FxSpacing.width(16),
+                                      Expanded(
+                                        child: FxText.bodyLarge(
+                                          itemName,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const Divider(
-                                  thickness: 0.8,
-                                ),
-                                Row(
-                                  children: [
-                                    FxContainer(
-                                      paddingAll: 12,
-                                      borderRadiusAll: 4,
-                                      color: CustomTheme.peach.withAlpha(20),
-                                      child: Text('ملاحظات عرض النورمال'.tr()),
-                                    ),
-                                    FxSpacing.width(16),
-                                    Expanded(
-                                      child: FxText.bodyLarge(
-                                        "price",
+                                    ],
+                                  ),
+                                  const Divider(
+                                    thickness: 0.8,
+                                  ),
+                                  Row(
+                                    children: [
+                                      FxContainer(
+                                        paddingAll: 12,
+                                        borderRadiusAll: 4,
+                                        color: CustomTheme.peach.withAlpha(20),
+                                        child: Text('packing'.tr()),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const Divider(
-                                  thickness: 0.8,
-                                ),
-                                Row(
-                                  children: [
-                                    FxContainer(
-                                      paddingAll: 12,
-                                      borderRadiusAll: 4,
-                                      color: CustomTheme.peach.withAlpha(20),
-                                      child: Text('ملاحظات عرض MIX'.tr()),
-                                    ),
-                                    FxSpacing.width(16),
-                                    Expanded(
-                                      child: FxText.bodyLarge(
-                                        "price",
+                                      FxSpacing.width(16),
+                                      Expanded(
+                                        child: FxText.bodyLarge(
+                                          itemEquivelentQty,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const Divider(
-                                  thickness: 0.8,
-                                ),
-                                Row(
-                                  children: [
-                                    FxContainer(
-                                      paddingAll: 12,
-                                      borderRadiusAll: 4,
-                                      color: CustomTheme.peach.withAlpha(20),
-                                      child: Text('ملاحظات عرض SET'.tr()),
-                                    ),
-                                    FxSpacing.width(16),
-                                    Expanded(
-                                      child: FxText.bodyLarge(
-                                        "price",
+                                    ],
+                                  ),
+                                  const Divider(
+                                    thickness: 0.8,
+                                  ),
+                                ],
+                              )),
+                              isExpanded: _dataExpansionPanel[0]),
+                          ExpansionPanel(
+                              canTapOnHeader: true,
+                              headerBuilder:
+                                  (BuildContext context, bool isExpanded) {
+                                return Container(
+                                  padding: FxSpacing.all(16),
+                                  child: FxText.titleMedium(
+                                      'معلومات العرض'.tr(),
+                                      fontWeight: isExpanded ? 700 : 600,
+                                      letterSpacing: 0),
+                                );
+                              },
+                              body: FxContainer(
+                                  child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      FxContainer(
+                                        paddingAll: 12,
+                                        borderRadiusAll: 4,
+                                        color: CustomTheme.peach.withAlpha(20),
+                                        child: Text('price'.tr()),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const Divider(
-                                  thickness: 0.8,
-                                ),
-                              ],
-                            )),
-                            isExpanded: _dataExpansionPanel[0]),
-                      ],
+                                      FxSpacing.width(16),
+                                      Expanded(
+                                        child: FxText.bodyLarge(
+                                          "null",
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const Divider(
+                                    thickness: 0.8,
+                                  ),
+                                  Row(
+                                    children: [
+                                      FxContainer(
+                                        paddingAll: 12,
+                                        borderRadiusAll: 4,
+                                        color: CustomTheme.peach.withAlpha(20),
+                                        child:
+                                            Text('ملاحظات عرض النورمال'.tr()),
+                                      ),
+                                      FxSpacing.width(16),
+                                      Expanded(
+                                        child: FxText.bodyLarge(
+                                          "null",
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const Divider(
+                                    thickness: 0.8,
+                                  ),
+                                  Row(
+                                    children: [
+                                      FxContainer(
+                                        paddingAll: 12,
+                                        borderRadiusAll: 4,
+                                        color: CustomTheme.peach.withAlpha(20),
+                                        child: Text('ملاحظات عرض MIX'.tr()),
+                                      ),
+                                      FxSpacing.width(16),
+                                      Expanded(
+                                        child: FxText.bodyLarge(
+                                          "null",
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const Divider(
+                                    thickness: 0.8,
+                                  ),
+                                  Row(
+                                    children: [
+                                      FxContainer(
+                                        paddingAll: 12,
+                                        borderRadiusAll: 4,
+                                        color: CustomTheme.peach.withAlpha(20),
+                                        child: Text('ملاحظات عرض SET'.tr()),
+                                      ),
+                                      FxSpacing.width(16),
+                                      Expanded(
+                                        child: FxText.bodyLarge(
+                                          "null",
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const Divider(
+                                    thickness: 0.8,
+                                  ),
+                                ],
+                              )),
+                              isExpanded: _dataExpansionPanel[1]),
+                        ],
+                      ),
                     ),
               FxTextField(
                 controller: _pOldItemPriceController,

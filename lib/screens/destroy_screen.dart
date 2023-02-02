@@ -26,6 +26,8 @@ class _DestroyScreenState extends State<DestroyScreen> {
   late CustomTheme customTheme;
   late ThemeData theme;
 
+  final List<bool> _dataExpansionPanel = [true];
+
   // Text Editing
   late TextEditingController _barcodeController;
   late TextEditingController _quantityDestroyController;
@@ -296,74 +298,98 @@ class _DestroyScreenState extends State<DestroyScreen> {
               ),
               (readOnly)
                   ? Container()
-                  : FxContainer(
-                      child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        FxText.titleMedium(
-                          'information_item'.tr(),
-                          fontWeight: 700,
-                        ),
-                        FxSpacing.height(8),
-                        Row(
-                          children: [
-                            FxContainer(
-                              paddingAll: 12,
-                              borderRadiusAll: 4,
-                              color: CustomTheme.peach.withAlpha(20),
-                              child: Text('item_no'.tr()),
-                            ),
-                            FxSpacing.width(16),
-                            Expanded(
-                              child: FxText.bodyLarge(
-                                itemNo,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Divider(
-                          thickness: 0.8,
-                        ),
-                        Row(
-                          children: [
-                            FxContainer(
-                              paddingAll: 12,
-                              borderRadiusAll: 4,
-                              color: CustomTheme.peach.withAlpha(20),
-                              child: Text('item_name'.tr()),
-                            ),
-                            FxSpacing.width(16),
-                            Expanded(
-                              child: FxText.bodyLarge(
-                                itemName,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Divider(
-                          thickness: 0.8,
-                        ),
-                        Row(
-                          children: [
-                            FxContainer(
-                              paddingAll: 12,
-                              borderRadiusAll: 4,
-                              color: CustomTheme.peach.withAlpha(20),
-                              child: Text('packing'.tr()),
-                            ),
-                            FxSpacing.width(16),
-                            Expanded(
-                              child: FxText.bodyLarge(
-                                itemEquivelentQty,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Divider(
-                          thickness: 0.8,
-                        ),
-                      ],
-                    )),
+                  : Container(
+                      padding: FxSpacing.only(bottom: 16),
+                      child: ExpansionPanelList(
+                          expandedHeaderPadding: const EdgeInsets.all(0),
+                          expansionCallback: (int index, bool isExpanded) {
+                            setState(() {
+                              _dataExpansionPanel[index] = !isExpanded;
+                            });
+                          },
+                          animationDuration: const Duration(milliseconds: 500),
+                          children: <ExpansionPanel>[
+                            ExpansionPanel(
+                                canTapOnHeader: true,
+                                headerBuilder:
+                                    (BuildContext context, bool isExpanded) {
+                                  return Container(
+                                    padding: FxSpacing.all(16),
+                                    child: FxText.titleMedium(
+                                        'information_item'.tr(),
+                                        fontWeight: isExpanded ? 700 : 600,
+                                        letterSpacing: 0),
+                                  );
+                                },
+                                body: FxContainer(
+                                    child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        FxContainer(
+                                          paddingAll: 12,
+                                          borderRadiusAll: 4,
+                                          color:
+                                              CustomTheme.peach.withAlpha(20),
+                                          child: Text('item_no'.tr()),
+                                        ),
+                                        FxSpacing.width(16),
+                                        Expanded(
+                                          child: FxText.bodyLarge(
+                                            itemNo,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const Divider(
+                                      thickness: 0.8,
+                                    ),
+                                    Row(
+                                      children: [
+                                        FxContainer(
+                                          paddingAll: 12,
+                                          borderRadiusAll: 4,
+                                          color:
+                                              CustomTheme.peach.withAlpha(20),
+                                          child: Text('item_name'.tr()),
+                                        ),
+                                        FxSpacing.width(16),
+                                        Expanded(
+                                          child: FxText.bodyLarge(
+                                            itemName,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const Divider(
+                                      thickness: 0.8,
+                                    ),
+                                    Row(
+                                      children: [
+                                        FxContainer(
+                                          paddingAll: 12,
+                                          borderRadiusAll: 4,
+                                          color:
+                                              CustomTheme.peach.withAlpha(20),
+                                          child: Text('packing'.tr()),
+                                        ),
+                                        FxSpacing.width(16),
+                                        Expanded(
+                                          child: FxText.bodyLarge(
+                                            itemEquivelentQty,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const Divider(
+                                      thickness: 0.8,
+                                    ),
+                                  ],
+                                )),
+                                isExpanded: _dataExpansionPanel[0]),
+                          ]),
+                    ),
               FxSpacing.height(24),
               FxTextField(
                 controller: _quantityDestroyController,

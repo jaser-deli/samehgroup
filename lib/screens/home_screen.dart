@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Consumer<AppNotifier>(
       builder: (BuildContext context, AppNotifier value, Widget? child) {
         return Container(
-            padding: FxSpacing.fromLTRB(20, 0, 20, 20),
+            padding: FxSpacing.fromLTRB(35, 24, 35, 24),
             child: ListView(
               shrinkWrap: true,
               physics: const ClampingScrollPhysics(),

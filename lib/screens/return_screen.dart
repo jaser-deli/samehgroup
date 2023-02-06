@@ -33,6 +33,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
   late TextEditingController _barcodeController;
   late TextEditingController _quantityDestroyController;
   late TextEditingController _quantityReservedController;
+  late TextEditingController _quantityController;
 
   // Focus Nodes
   late FocusNode _supplierFocusNode;
@@ -42,7 +43,6 @@ class _ReturnScreenState extends State<ReturnScreen> {
   bool readOnlyQuantity = true;
 
   // information Data Set
-  double quantityDestroy = 0;
   String supplierName = "";
   String supplierNo = "";
   String branchNo = "";
@@ -57,6 +57,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
     _barcodeController = TextEditingController();
     _quantityDestroyController = TextEditingController();
     _quantityReservedController = TextEditingController();
+    _quantityController = TextEditingController();
 
     _supplierFocusNode = FocusNode();
 
@@ -132,7 +133,11 @@ class _ReturnScreenState extends State<ReturnScreen> {
         showTopSnackBar(
           Overlay.of(context),
           CustomSnackBar.error(
-            message: 'p_c_t_b_n_e'.tr(),
+            maxLines: 3,
+            message: 'p_c_t_b_n_e_return'.tr(),
+            // الرجاء التاكد من وجود كميه للصنف في مستودع الأرجعات؟
+            // التاكد ان الصنف مربوط على المورد!
+            //
           ),
         );
       }
@@ -197,8 +202,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
       setState(() {
-        quantityDestroy =
-            double.parse(responseBody["data"][0]["quantity_destroy"]);
+        _quantityController.text = responseBody["data"][0]["quantity_destroy"];
       });
     }
   }
@@ -618,6 +622,47 @@ class _ReturnScreenState extends State<ReturnScreen> {
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
+              FxSpacing.height(24),
+              FxTextField(
+                enabled: false,
+                controller: _quantityController,
+                cursorColor: customTheme.Primary,
+                readOnly: true,
+                style: TextStyle(color: customTheme.Primary),
+                keyboardType: TextInputType.text,
+                maxLines: 1,
+                decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.shopping_cart_checkout,
+                        color: customTheme.Primary),
+                    prefixIconColor: customTheme.Primary,
+                    hintText: 'الكمية الحاليه'.tr(),
+                    hintStyle: TextStyle(color: customTheme.Primary),
+                    fillColor: customTheme.Primary.withAlpha(40),
+                    filled: true,
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    counter: const Offstage(),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: customTheme.Primary,
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0)),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: Colors.transparent,
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0)),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: customTheme.Primary,
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0))),
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+                ],
+              ),
               FxSpacing.height(16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -659,16 +704,8 @@ class _ReturnScreenState extends State<ReturnScreen> {
 
   void validation() {
     if (_barcodeController.text.isNotEmpty) {
-      // if (double.parse(_quantityReservedController.text) > 0) {
-      //   showTopSnackBar(
-      //     Overlay.of(context),
-      //     CustomSnackBar.error(
-      //       message: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
-      //     ),
-      //   );
-      // } else
-
-      if (double.parse(_quantityDestroyController.text) > quantityDestroy) {
+      if (double.parse(_quantityDestroyController.text) >
+          double.parse(_quantityController.text)) {
         showTopSnackBar(
           Overlay.of(context),
           CustomSnackBar.error(
@@ -733,6 +770,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
     _barcodeController.clear();
     _quantityDestroyController.clear();
     _quantityReservedController.clear();
+    _quantityController.clear();
 
     _supplierFocusNode.requestFocus();
 

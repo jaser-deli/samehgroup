@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
+import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/screens/barcode_scanner_screen.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
 import 'package:samehgroup/extensions/string.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:http/http.dart' as http;
@@ -38,6 +40,12 @@ class _PricingScreenState extends State<PricingScreen> {
   String itemName = "";
   String itemEquivelentQty = "";
 
+  String priceOffer = "";
+  String price = "";
+  String normal = "";
+  String mix = "";
+  String set = "";
+
   @override
   void initState() {
     super.initState();
@@ -52,16 +60,20 @@ class _PricingScreenState extends State<PricingScreen> {
   }
 
   Future<void> getItem() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    Map<String, dynamic> userInfo =
+        jsonDecode(preferences.getString(ConfigSharedPreferences.userInfo)!)
+            as Map<String, dynamic>;
+
     var response =
         await http.get(Uri.parse("${Api.pricing}/${_barcodeController.text}"));
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
 
       if (responseBody["data"] != null) {
-
-        // wait get Quantity Destroy
-        // await getQuantityDestroy(
-        //     responseBody["data"]["branch_no"], responseBody["data"]["item_no"]);
+        await getOffer(
+            userInfo["branch_no"], responseBody["data"]["item_barcode"]);
 
         setState(() {
           itemNo = responseBody["data"]["item_no"];
@@ -81,17 +93,25 @@ class _PricingScreenState extends State<PricingScreen> {
     }
   }
 
-  Future<void> getQuantityDestroy(
+  Future<void> getOffer(
     String branchNo,
-    String itemNo,
+    String barcode,
   ) async {
-    var response =
-        await http.get(Uri.parse("${Api.quantityDestroy}/$branchNo/$itemNo"));
+    Map<String, dynamic> body = {
+      'branch_no': branchNo,
+      'barcode': barcode,
+    };
+
+    var response = await http.post(Uri.parse(Api.offer), body: body);
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
 
       setState(() {
-        // quantityDestroy = responseBody["data"][0]["quantity_destroy"];
+        priceOffer = responseBody["data"]["P_NORMAL_PRICE"] ?? "";
+        price = responseBody["data"]["P_SELL_PRICE"] ?? "";
+        normal = responseBody["data"]["P_NORMAL_REMARK_A"] ?? "";
+        mix = responseBody["data"]["P_MIX_REMARK_A"] ?? "";
+        set = responseBody["data"]["P_SET_REMARK_A"] ?? "";
       });
     }
   }
@@ -210,194 +230,6 @@ class _PricingScreenState extends State<PricingScreen> {
                 ],
               ),
               FxSpacing.height(16),
-              (readOnly)
-                  ? Container()
-                  : Container(
-                      padding: FxSpacing.only(bottom: 16),
-                      child: ExpansionPanelList(
-                        expandedHeaderPadding: const EdgeInsets.all(0),
-                        expansionCallback: (int index, bool isExpanded) {
-                          setState(() {
-                            _dataExpansionPanel[index] = !isExpanded;
-                          });
-                        },
-                        animationDuration: const Duration(milliseconds: 500),
-                        children: <ExpansionPanel>[
-                          ExpansionPanel(
-                              canTapOnHeader: true,
-                              headerBuilder:
-                                  (BuildContext context, bool isExpanded) {
-                                return Container(
-                                  padding: FxSpacing.all(16),
-                                  child: FxText.titleMedium(
-                                      'information_item'.tr(),
-                                      fontWeight: isExpanded ? 700 : 600,
-                                      letterSpacing: 0),
-                                );
-                              },
-                              body: FxContainer(
-                                  child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      FxContainer(
-                                        paddingAll: 12,
-                                        borderRadiusAll: 4,
-                                        color: CustomTheme.peach.withAlpha(20),
-                                        child: Text('item_no'.tr()),
-                                      ),
-                                      FxSpacing.width(16),
-                                      Expanded(
-                                        child: FxText.bodyLarge(
-                                          itemNo,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Divider(
-                                    thickness: 0.8,
-                                  ),
-                                  Row(
-                                    children: [
-                                      FxContainer(
-                                        paddingAll: 12,
-                                        borderRadiusAll: 4,
-                                        color: CustomTheme.peach.withAlpha(20),
-                                        child: Text('item_name'.tr()),
-                                      ),
-                                      FxSpacing.width(16),
-                                      Expanded(
-                                        child: FxText.bodyLarge(
-                                          itemName,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Divider(
-                                    thickness: 0.8,
-                                  ),
-                                  Row(
-                                    children: [
-                                      FxContainer(
-                                        paddingAll: 12,
-                                        borderRadiusAll: 4,
-                                        color: CustomTheme.peach.withAlpha(20),
-                                        child: Text('packing'.tr()),
-                                      ),
-                                      FxSpacing.width(16),
-                                      Expanded(
-                                        child: FxText.bodyLarge(
-                                          itemEquivelentQty,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Divider(
-                                    thickness: 0.8,
-                                  ),
-                                ],
-                              )),
-                              isExpanded: _dataExpansionPanel[0]),
-                          ExpansionPanel(
-                              canTapOnHeader: true,
-                              headerBuilder:
-                                  (BuildContext context, bool isExpanded) {
-                                return Container(
-                                  padding: FxSpacing.all(16),
-                                  child: FxText.titleMedium(
-                                      'معلومات العرض'.tr(),
-                                      fontWeight: isExpanded ? 700 : 600,
-                                      letterSpacing: 0),
-                                );
-                              },
-                              body: FxContainer(
-                                  child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      FxContainer(
-                                        paddingAll: 12,
-                                        borderRadiusAll: 4,
-                                        color: CustomTheme.peach.withAlpha(20),
-                                        child: Text('price'.tr()),
-                                      ),
-                                      FxSpacing.width(16),
-                                      Expanded(
-                                        child: FxText.bodyLarge(
-                                          "null",
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Divider(
-                                    thickness: 0.8,
-                                  ),
-                                  Row(
-                                    children: [
-                                      FxContainer(
-                                        paddingAll: 12,
-                                        borderRadiusAll: 4,
-                                        color: CustomTheme.peach.withAlpha(20),
-                                        child:
-                                            Text('ملاحظات عرض النورمال'.tr()),
-                                      ),
-                                      FxSpacing.width(16),
-                                      Expanded(
-                                        child: FxText.bodyLarge(
-                                          "null",
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Divider(
-                                    thickness: 0.8,
-                                  ),
-                                  Row(
-                                    children: [
-                                      FxContainer(
-                                        paddingAll: 12,
-                                        borderRadiusAll: 4,
-                                        color: CustomTheme.peach.withAlpha(20),
-                                        child: Text('ملاحظات عرض MIX'.tr()),
-                                      ),
-                                      FxSpacing.width(16),
-                                      Expanded(
-                                        child: FxText.bodyLarge(
-                                          "null",
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Divider(
-                                    thickness: 0.8,
-                                  ),
-                                  Row(
-                                    children: [
-                                      FxContainer(
-                                        paddingAll: 12,
-                                        borderRadiusAll: 4,
-                                        color: CustomTheme.peach.withAlpha(20),
-                                        child: Text('ملاحظات عرض SET'.tr()),
-                                      ),
-                                      FxSpacing.width(16),
-                                      Expanded(
-                                        child: FxText.bodyLarge(
-                                          "null",
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const Divider(
-                                    thickness: 0.8,
-                                  ),
-                                ],
-                              )),
-                              isExpanded: _dataExpansionPanel[1]),
-                        ],
-                      ),
-                    ),
               FxTextField(
                 controller: _pOldItemPriceController,
                 cursorColor: customTheme.Primary,
@@ -446,12 +278,354 @@ class _PricingScreenState extends State<PricingScreen> {
                   borderRadiusAll: 8,
                   onPressed: () {
                     validation();
+
+                    if (priceOffer.isEmpty) {
+                      // price
+                      // Set And Max
+                    } else {
+                      // priceOffer
+                      // normal
+                    }
                   },
                   backgroundColor: customTheme.Primary,
                   child: FxText.labelLarge(
                     "print".tr(),
                     color: customTheme.OnPrimary,
                   )),
+              FxSpacing.height(16),
+              (readOnly)
+                  ? Container()
+                  : Container(
+                      padding: FxSpacing.only(bottom: 16),
+                      child: (priceOffer.isNotEmpty)
+                          ? ExpansionPanelList(
+                              expandedHeaderPadding: const EdgeInsets.all(0),
+                              expansionCallback: (int index, bool isExpanded) {
+                                setState(() {
+                                  _dataExpansionPanel[index] = !isExpanded;
+                                });
+                              },
+                              animationDuration:
+                                  const Duration(milliseconds: 500),
+                              children: <ExpansionPanel>[
+                                ExpansionPanel(
+                                    canTapOnHeader: true,
+                                    headerBuilder: (BuildContext context,
+                                        bool isExpanded) {
+                                      return Container(
+                                        padding: FxSpacing.all(16),
+                                        child: FxText.titleMedium(
+                                            'information_item'.tr(),
+                                            fontWeight: isExpanded ? 700 : 600,
+                                            letterSpacing: 0),
+                                      );
+                                    },
+                                    body: FxContainer(
+                                        child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            FxContainer(
+                                              paddingAll: 12,
+                                              borderRadiusAll: 4,
+                                              color: CustomTheme.peach
+                                                  .withAlpha(20),
+                                              child: Text('item_no'.tr()),
+                                            ),
+                                            FxSpacing.width(16),
+                                            Expanded(
+                                              child: FxText.bodyLarge(
+                                                itemNo,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(
+                                          thickness: 0.8,
+                                        ),
+                                        Row(
+                                          children: [
+                                            FxContainer(
+                                              paddingAll: 12,
+                                              borderRadiusAll: 4,
+                                              color: CustomTheme.peach
+                                                  .withAlpha(20),
+                                              child: Text('item_name'.tr()),
+                                            ),
+                                            FxSpacing.width(16),
+                                            Expanded(
+                                              child: FxText.bodyLarge(
+                                                itemName,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(
+                                          thickness: 0.8,
+                                        ),
+                                        Row(
+                                          children: [
+                                            FxContainer(
+                                              paddingAll: 12,
+                                              borderRadiusAll: 4,
+                                              color: CustomTheme.peach
+                                                  .withAlpha(20),
+                                              child: Text('packing'.tr()),
+                                            ),
+                                            FxSpacing.width(16),
+                                            Expanded(
+                                              child: FxText.bodyLarge(
+                                                itemEquivelentQty,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(
+                                          thickness: 0.8,
+                                        ),
+                                      ],
+                                    )),
+                                    isExpanded: _dataExpansionPanel[0]),
+                                ExpansionPanel(
+                                    canTapOnHeader: true,
+                                    headerBuilder: (BuildContext context,
+                                        bool isExpanded) {
+                                      return Container(
+                                        padding: FxSpacing.all(16),
+                                        child: FxText.titleMedium(
+                                            'معلومات العرض'.tr(),
+                                            fontWeight: isExpanded ? 700 : 600,
+                                            letterSpacing: 0),
+                                      );
+                                    },
+                                    body: FxContainer(
+                                        child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            FxContainer(
+                                              paddingAll: 12,
+                                              borderRadiusAll: 4,
+                                              color: CustomTheme.peach
+                                                  .withAlpha(20),
+                                              child: Text('سعر الصنف'.tr()),
+                                            ),
+                                            FxSpacing.width(16),
+                                            Expanded(
+                                              child: FxText.bodyLarge(
+                                                price,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(
+                                          thickness: 0.8,
+                                        ),
+                                        Row(
+                                          children: [
+                                            FxContainer(
+                                              paddingAll: 12,
+                                              borderRadiusAll: 4,
+                                              color: CustomTheme.peach
+                                                  .withAlpha(20),
+                                              child: Text('سعر العرض'.tr()),
+                                            ),
+                                            FxSpacing.width(16),
+                                            Expanded(
+                                              child: FxText.bodyLarge(
+                                                priceOffer,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(
+                                          thickness: 0.8,
+                                        ),
+                                        Row(
+                                          children: [
+                                            FxContainer(
+                                              paddingAll: 12,
+                                              borderRadiusAll: 4,
+                                              color: CustomTheme.peach
+                                                  .withAlpha(20),
+                                              child: Text(
+                                                  'ملاحظات عرض النورمال'.tr()),
+                                            ),
+                                            FxSpacing.width(16),
+                                            Expanded(
+                                              child: FxText.bodyLarge(
+                                                normal,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(
+                                          thickness: 0.8,
+                                        ),
+                                        Row(
+                                          children: [
+                                            FxContainer(
+                                              paddingAll: 12,
+                                              borderRadiusAll: 4,
+                                              color: CustomTheme.peach
+                                                  .withAlpha(20),
+                                              child:
+                                                  Text('ملاحظات عرض MIX'.tr()),
+                                            ),
+                                            FxSpacing.width(16),
+                                            Expanded(
+                                              child: FxText.bodyLarge(
+                                                mix,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(
+                                          thickness: 0.8,
+                                        ),
+                                        Row(
+                                          children: [
+                                            FxContainer(
+                                              paddingAll: 12,
+                                              borderRadiusAll: 4,
+                                              color: CustomTheme.peach
+                                                  .withAlpha(20),
+                                              child:
+                                                  Text('ملاحظات عرض SET'.tr()),
+                                            ),
+                                            FxSpacing.width(16),
+                                            Expanded(
+                                              child: FxText.bodyLarge(
+                                                set,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(
+                                          thickness: 0.8,
+                                        ),
+                                      ],
+                                    )),
+                                    isExpanded: _dataExpansionPanel[1])
+                              ],
+                            )
+                          : ExpansionPanelList(
+                              expandedHeaderPadding: const EdgeInsets.all(0),
+                              expansionCallback: (int index, bool isExpanded) {
+                                setState(() {
+                                  _dataExpansionPanel[index] = !isExpanded;
+                                });
+                              },
+                              animationDuration:
+                                  const Duration(milliseconds: 500),
+                              children: <ExpansionPanel>[
+                                ExpansionPanel(
+                                    canTapOnHeader: true,
+                                    headerBuilder: (BuildContext context,
+                                        bool isExpanded) {
+                                      return Container(
+                                        padding: FxSpacing.all(16),
+                                        child: FxText.titleMedium(
+                                            'information_item'.tr(),
+                                            fontWeight: isExpanded ? 700 : 600,
+                                            letterSpacing: 0),
+                                      );
+                                    },
+                                    body: FxContainer(
+                                        child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            FxContainer(
+                                              paddingAll: 12,
+                                              borderRadiusAll: 4,
+                                              color: CustomTheme.peach
+                                                  .withAlpha(20),
+                                              child: Text('item_no'.tr()),
+                                            ),
+                                            FxSpacing.width(16),
+                                            Expanded(
+                                              child: FxText.bodyLarge(
+                                                itemNo,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(
+                                          thickness: 0.8,
+                                        ),
+                                        Row(
+                                          children: [
+                                            FxContainer(
+                                              paddingAll: 12,
+                                              borderRadiusAll: 4,
+                                              color: CustomTheme.peach
+                                                  .withAlpha(20),
+                                              child: Text('item_name'.tr()),
+                                            ),
+                                            FxSpacing.width(16),
+                                            Expanded(
+                                              child: FxText.bodyLarge(
+                                                itemName,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(
+                                          thickness: 0.8,
+                                        ),
+                                        Row(
+                                          children: [
+                                            FxContainer(
+                                              paddingAll: 12,
+                                              borderRadiusAll: 4,
+                                              color: CustomTheme.peach
+                                                  .withAlpha(20),
+                                              child: Text('packing'.tr()),
+                                            ),
+                                            FxSpacing.width(16),
+                                            Expanded(
+                                              child: FxText.bodyLarge(
+                                                itemEquivelentQty,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(
+                                          thickness: 0.8,
+                                        ),
+                                        Row(
+                                          children: [
+                                            FxContainer(
+                                              paddingAll: 12,
+                                              borderRadiusAll: 4,
+                                              color: CustomTheme.peach
+                                                  .withAlpha(20),
+                                              child: Text('price'.tr()),
+                                            ),
+                                            FxSpacing.width(16),
+                                            Expanded(
+                                              child: FxText.bodyLarge(
+                                                price,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const Divider(
+                                          thickness: 0.8,
+                                        ),
+                                      ],
+                                    )),
+                                    isExpanded: _dataExpansionPanel[0]),
+                              ],
+                            ),
+                    ),
               FxSpacing.height(16),
             ],
           ),

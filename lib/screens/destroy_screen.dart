@@ -32,6 +32,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
   late TextEditingController _barcodeController;
   late TextEditingController _quantityDestroyController;
   late TextEditingController _quantityReservedController;
+  late TextEditingController _quantityController;
 
   // Focus Nodes
   late FocusNode _barcodeFocusNode;
@@ -41,7 +42,6 @@ class _DestroyScreenState extends State<DestroyScreen> {
   bool readOnly = true;
 
   // information Data Set
-  String quantityDestroy = "";
   String branchNo = "";
   String itemNo = "";
   String itemName = "";
@@ -53,6 +53,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
     _barcodeController = TextEditingController();
     _quantityDestroyController = TextEditingController();
     _quantityReservedController = TextEditingController();
+    _quantityController = TextEditingController();
 
     _barcodeFocusNode = FocusNode();
     _quantityDestroyFocusNode = FocusNode();
@@ -106,7 +107,8 @@ class _DestroyScreenState extends State<DestroyScreen> {
         showTopSnackBar(
           Overlay.of(context),
           CustomSnackBar.error(
-            message: 'p_c_t_b_n_e'.tr(),
+            maxLines: 3,
+            message: 'p_c_t_b_n_e_destroy'.tr(),
           ),
         );
       }
@@ -139,7 +141,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
       var responseBody = json.decode(response.body);
 
       setState(() {
-        quantityDestroy = responseBody["data"][0]["quantity_destroy"];
+        _quantityController.text = responseBody["data"][0]["quantity_destroy"];
       });
     }
   }
@@ -161,7 +163,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
       if (responseBody["data"] == 1) {
         showTopSnackBar(
           Overlay.of(context),
-          CustomSnackBar.error(
+          CustomSnackBar.success(
             message: 'o_a_s'.tr(),
           ),
         );
@@ -476,6 +478,47 @@ class _DestroyScreenState extends State<DestroyScreen> {
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
                 ],
               ),
+              FxSpacing.height(24),
+              FxTextField(
+                enabled: false,
+                controller: _quantityController,
+                cursorColor: customTheme.Primary,
+                readOnly: true,
+                style: TextStyle(color: customTheme.Primary),
+                keyboardType: TextInputType.text,
+                maxLines: 1,
+                decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.shopping_cart_checkout,
+                        color: customTheme.Primary),
+                    prefixIconColor: customTheme.Primary,
+                    hintText: 'كمية الحالية'.tr(),
+                    hintStyle: TextStyle(color: customTheme.Primary),
+                    fillColor: customTheme.Primary.withAlpha(40),
+                    filled: true,
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    counter: const Offstage(),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: customTheme.Primary,
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0)),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: Colors.transparent,
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0)),
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: customTheme.Primary,
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(8.0))),
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+                ],
+              ),
               FxSpacing.height(16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -516,17 +559,8 @@ class _DestroyScreenState extends State<DestroyScreen> {
 
   void validation() {
     if (_barcodeController.text.isNotEmpty) {
-      // if (double.parse(_quantityReservedController.text) > 0) {
-      //   showTopSnackBar(
-      //     Overlay.of(context),
-      //     CustomSnackBar.error(
-      //       message: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
-      //     ),
-      //   );
-      // } else
-
       if (double.parse(_quantityDestroyController.text) >
-          double.parse(quantityDestroy)) {
+          double.parse(_quantityController.text)) {
         showTopSnackBar(
           Overlay.of(context),
           CustomSnackBar.error(
@@ -542,6 +576,10 @@ class _DestroyScreenState extends State<DestroyScreen> {
       }
     } else {
       validationField(_barcodeController.text, 'p_e_barcode_no', getItem());
+
+      // الرجاء التاكد ان الصنف محول على التوالف
+      // ويوجد له كميه
+      // وصنف غير مكفول
     }
   }
 
@@ -571,6 +609,7 @@ class _DestroyScreenState extends State<DestroyScreen> {
     _barcodeController.clear();
     _quantityDestroyController.clear();
     _quantityReservedController.clear();
+    _quantityController.clear();
 
     _barcodeFocusNode.requestFocus();
 

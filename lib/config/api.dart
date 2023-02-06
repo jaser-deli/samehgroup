@@ -51,4 +51,9 @@ class Api {
   static String inventoryClear = "${baseUrl}inventory/clear";
 
   static String pricing = "${baseUrl}pricing";
+  static String offer = "${baseUrl}pricing/offer";
+
+  static String ricivingSupplier = "${baseUrl}riciving";
+  static String ricivingBarcode = "${baseUrl}riciving/barcode";
+  static String ricivingSave = "${baseUrl}riciving/save";
 }

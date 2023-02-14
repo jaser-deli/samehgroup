@@ -9,6 +9,7 @@ import 'package:samehgroup/config/images.dart';
 import 'package:samehgroup/config/screens.dart';
 import 'package:samehgroup/extensions/string.dart';
 import 'package:samehgroup/extensions/widgets_extension.dart';
+import 'package:samehgroup/screens/printer_screen.dart';
 import 'package:samehgroup/screens/select_language_dialog.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
@@ -206,6 +207,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Expanded(
                             child: FxText.bodyLarge(
                               'language'.tr(),
+                            ),
+                          ),
+                          FxSpacing.width(16),
+                          Icon(
+                            FeatherIcons.chevronRight,
+                            size: 18,
+                            color: theme.colorScheme.onBackground,
+                          ).autoDirection(),
+                        ],
+                      ),
+                    ),
+                    const Divider(
+                      thickness: 0.8,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) => const PrintScreen()),
+                        );
+                      },
+                      highlightColor: Colors.transparent,
+                      splashColor: Colors.transparent,
+                      child: Row(
+                        children: [
+                          FxContainer(
+                            paddingAll: 12,
+                            borderRadiusAll: 4,
+                            color: CustomTheme.peach.withAlpha(20),
+                            child: Image(
+                              height: 20,
+                              width: 20,
+                              image: AssetImage(Images.printOutline),
+                              color: CustomTheme.peach,
+                            ),
+                          ),
+                          FxSpacing.width(16),
+                          Expanded(
+                            child: FxText.bodyLarge(
+                              'print'.tr(),
                             ),
                           ),
                           FxSpacing.width(16),

@@ -1,4 +1,4 @@
-enum Screens { main, home, login, profile, language, update }
+enum Screens { main, home, login, profile, language, update, requirements }
 
 extension ScreenExtension on Screens {
   String get value {
@@ -15,6 +15,8 @@ extension ScreenExtension on Screens {
         return "/language";
       case Screens.update:
         return "/update";
+      case Screens.requirements:
+        return "/requirements";
       default:
         return "/";
     }

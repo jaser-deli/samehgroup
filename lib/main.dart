@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'package:appcheck/appcheck.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -16,6 +17,7 @@ import 'package:samehgroup/screens/home_screen.dart';
 import 'package:samehgroup/screens/login_screen.dart';
 import 'package:samehgroup/screens/main_screen.dart';
 import 'package:samehgroup/screens/profile_screen.dart';
+import 'package:samehgroup/screens/requirements_screen.dart';
 import 'package:samehgroup/screens/select_language_screen.dart';
 import 'package:samehgroup/screens/update_screen.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
@@ -121,26 +123,68 @@ Future<void> main() async {
   ));
 }
 
+Future<Map> requirements(String packageName) async {
+  var check = await AppCheck.getInstalledApps();
+  bool isEnable = false;
+
+  if (check!.where((i) => i.packageName == packageName).toList().isNotEmpty) {
+    isEnable = await AppCheck.isAppEnabled(packageName);
+  }
+
+  var data = {
+    "exists":
+        check.where((i) => i.packageName == packageName).toList().isNotEmpty,
+    "is_enable": isEnable
+  };
+
+  return data;
+}
+
 Future<void> isUpdate() async {
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+
   var response = await http.get(Uri.parse("${Api.app}/pda"));
 
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
+  await requirements("com.masera.khh_barcodeprint").then((value) {
+    preferences.setString(
+        ConfigSharedPreferences.barcodePrint, jsonEncode(value));
+  });
+
+  await requirements("com.google.android.gms").then((value) {
+    preferences.setString(ConfigSharedPreferences.gms, jsonEncode(value));
+  });
+
+  Map<String, dynamic> barcodePrintInfo =
+      jsonDecode(preferences.getString(ConfigSharedPreferences.barcodePrint)!)
+          as Map<String, dynamic>;
+
+  Map<String, dynamic> gmsInfo =
+      jsonDecode(preferences.getString(ConfigSharedPreferences.gms)!)
+          as Map<String, dynamic>;
+
   if (response.statusCode == 200) {
     var responseBody = json.decode(response.body);
 
-    if (responseBody["data"][0] != null) {
-      Version currentVersion = Version.parse(packageInfo.version.toString());
-      Version latestVersion =
-          Version.parse(responseBody["data"][0]["version"].toString());
+    if ((barcodePrintInfo["exists"] == true &&
+            barcodePrintInfo["is_enable"] == true) &&
+        (gmsInfo["exists"] == true && gmsInfo["is_enable"] == true)) {
+      if (responseBody["data"][0] != null) {
+        Version currentVersion = Version.parse(packageInfo.version.toString());
+        Version latestVersion =
+            Version.parse(responseBody["data"][0]["version"].toString());
 
-      if (latestVersion > currentVersion) {
-        loadView = Screens.update.value;
+        if (latestVersion > currentVersion) {
+          loadView = Screens.update.value;
+        } else {
+          loadView = await isLogin();
+        }
       } else {
         loadView = await isLogin();
       }
     } else {
-      loadView = await isLogin();
+      loadView = Screens.requirements.value;
     }
   }
 }
@@ -259,7 +303,8 @@ class _MyAppState extends State<MyApp> {
             Screens.home.value: (context) => const HomeScreen(),
             Screens.profile.value: (context) => const ProfileScreen(),
             Screens.language.value: (context) => const SelectLanguageScreen(),
-            Screens.update.value: (context) => const UpdateScreen()
+            Screens.update.value: (context) => const UpdateScreen(),
+            Screens.requirements.value: (context) => const Requirements()
           },
         );
       },

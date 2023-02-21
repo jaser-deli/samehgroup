@@ -610,7 +610,6 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                   ),
                 ],
               ),
-
               FxSpacing.height(24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -722,71 +721,70 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                   ),
                 ],
               ),
-
               FxSpacing.height(16),
-              // FxButton.medium(
-              //     borderRadiusAll: 8,
-              //     onPressed: () async {
-              //       final String? imagePath =
-              //           await Navigator.of(context).push(MaterialPageRoute(
-              //               builder: (_) => CameraScreen(
-              //                     camera: _cameraDescription,
-              //                   )));
-              //
-              //       print('imagepath: $imagePath');
-              //
-              //       if (imagePath != null) {
-              //         setState(() {
-              //           _images.add(imagePath);
-              //         });
-              //       }
-              //
-              //       // if (double.parse(_quantityReservedController.text) > 0) {
-              //       //   AwesomeDialog(
-              //       //       context: context,
-              //       //       dialogType: DialogType.error,
-              //       //       animType: AnimType.BOTTOMSLIDE,
-              //       //       title: 'error'.tr(),
-              //       //       desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
-              //       //       btnOkText: 'ok'.tr(),
-              //       //       btnOkOnPress: () {})
-              //       //       .show();
-              //       // } else if (double.parse(_quantityDestroyController.text) >
-              //       //     quantityDestroy) {
-              //       //   AwesomeDialog(
-              //       //       context: context,
-              //       //       dialogType: DialogType.error,
-              //       //       animType: AnimType.BOTTOMSLIDE,
-              //       //       title: 'error'.tr(),
-              //       //       desc: 't_r_q_is_g_t_t_c_q'.tr(),
-              //       //       btnOkText: 'ok'.tr(),
-              //       //       btnOkOnPress: () {})
-              //       //       .show();
-              //       // } else {
-              //       //   save(
-              //       //       supplierNo.toString(),
-              //       //       branchNo.toString(),
-              //       //       itemNo.toString(),
-              //       //       _barcodeController.text,
-              //       //       itemEquivelentQty,
-              //       //       _quantityDestroyController.text);
-              //       // }
-              //       //
-              //       // setState(() {
-              //       //   readOnlyBarcode = true;
-              //       //   readOnlyQuantity = true;
-              //       // });
-              //       //
-              //       // _supplierController.clear();
-              //       // _barcodeController.clear();
-              //       // _quantityDestroyController.clear();
-              //       // _quantityReservedController.clear();
-              //     },
-              //     backgroundColor: customTheme.Primary,
-              //     child: FxText.labelLarge(
-              //       "صورة الفاتورة".tr(),
-              //       color: customTheme.OnPrimary,
-              //     )),
+              FxButton.medium(
+                  borderRadiusAll: 8,
+                  onPressed: () async {
+                    // final String? imagePath =
+                    //     await Navigator.of(context).push(MaterialPageRoute(
+                    //         builder: (_) => CameraScreen(
+                    //               camera: _cameraDescription,
+                    //             )));
+
+                    // print('imagepath: $imagePath');
+
+                    // if (imagePath != null) {
+                    //   setState(() {
+                    //     _images.add(imagePath);
+                    //   });
+                    // }
+
+                    // if (double.parse(_quantityReservedController.text) > 0) {
+                    //   AwesomeDialog(
+                    //       context: context,
+                    //       dialogType: DialogType.error,
+                    //       animType: AnimType.BOTTOMSLIDE,
+                    //       title: 'error'.tr(),
+                    //       desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
+                    //       btnOkText: 'ok'.tr(),
+                    //       btnOkOnPress: () {})
+                    //       .show();
+                    // } else if (double.parse(_quantityDestroyController.text) >
+                    //     quantityDestroy) {
+                    //   AwesomeDialog(
+                    //       context: context,
+                    //       dialogType: DialogType.error,
+                    //       animType: AnimType.BOTTOMSLIDE,
+                    //       title: 'error'.tr(),
+                    //       desc: 't_r_q_is_g_t_t_c_q'.tr(),
+                    //       btnOkText: 'ok'.tr(),
+                    //       btnOkOnPress: () {})
+                    //       .show();
+                    // } else {
+                    //   save(
+                    //       supplierNo.toString(),
+                    //       branchNo.toString(),
+                    //       itemNo.toString(),
+                    //       _barcodeController.text,
+                    //       itemEquivelentQty,
+                    //       _quantityDestroyController.text);
+                    // }
+                    //
+                    // setState(() {
+                    //   readOnlyBarcode = true;
+                    //   readOnlyQuantity = true;
+                    // });
+                    //
+                    // _supplierController.clear();
+                    // _barcodeController.clear();
+                    // _quantityDestroyController.clear();
+                    // _quantityReservedController.clear();
+                  },
+                  backgroundColor: customTheme.Primary,
+                  child: FxText.labelLarge(
+                    "صورة الفاتورة".tr(),
+                    color: customTheme.OnPrimary,
+                  )),
               FxSpacing.height(16),
               FxButton.medium(
                   borderRadiusAll: 8,

@@ -1,15 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:appcheck/appcheck.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/config/style.dart';
 import 'package:samehgroup/extensions/string.dart';
-import 'package:samehgroup/screens/notification_item_screen.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -31,9 +28,6 @@ class _RequirementsState extends State<Requirements> {
   bool barcodePrint = false;
   bool isEnableBarcodePrint = false;
 
-  bool gms = false;
-  bool isEnableGms = false;
-
   @override
   void initState() {
     super.initState();
@@ -50,16 +44,9 @@ class _RequirementsState extends State<Requirements> {
         jsonDecode(preferences.getString(ConfigSharedPreferences.barcodePrint)!)
             as Map<String, dynamic>;
 
-    Map<String, dynamic> gmsInfo =
-        jsonDecode(preferences.getString(ConfigSharedPreferences.gms)!)
-            as Map<String, dynamic>;
-
     setState(() {
       barcodePrint = barcodePrintInfo["exists"];
       isEnableBarcodePrint = barcodePrintInfo["is_enable"];
-
-      gms = gmsInfo["exists"];
-      isEnableGms = gmsInfo["is_enable"];
     });
   }
 
@@ -174,84 +161,6 @@ class _RequirementsState extends State<Requirements> {
                             ),
                           ),
                           const Divider(),
-                          InkWell(
-                            onTap: () {
-                              launch(
-                                  "https://www.apkmirror.com/apk/google-inc/google-play-services/google-play-services-23-06-16-release/google-play-services-23-06-16-040300-510240997-android-apk-download/");
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 12, left: 16, right: 16, bottom: 12),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  CircleAvatar(
-                                    backgroundColor: customTheme.Primary,
-                                    child: Icon(Icons.android,
-                                        color: customTheme.OnPrimary),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 16, right: 16),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Row(
-                                            children: <Widget>[
-                                              Expanded(
-                                                  flex: 1,
-                                                  child: FxText.titleSmall(
-                                                      "Google Play services",
-                                                      fontWeight: 500)),
-                                              FxText.titleSmall(
-                                                  isEnableGms
-                                                      ? "Enabled"
-                                                      : "Disabled",
-                                                  fontWeight: 500)
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                flex: 1,
-                                                child: FxText.bodyMedium(
-                                                  gms == true
-                                                      ? "Installed"
-                                                      : "Not Install",
-                                                  fontWeight: 500,
-                                                  letterSpacing: 0,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              (isEnableGms == true)
-                                                  ? Icon(
-                                                      Icons.circle,
-                                                      size: 10,
-                                                      color: customTheme
-                                                          .colorSuccess,
-                                                    )
-                                                  : Icon(
-                                                      Icons.circle,
-                                                      size: 10,
-                                                      color:
-                                                          customTheme.Primary,
-                                                    )
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                          const Divider()
                         ],
                       ),
                     ),

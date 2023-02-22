@@ -25,8 +25,6 @@ class _PricingScreenState extends State<PricingScreen> {
   late CustomTheme customTheme;
   late ThemeData theme;
 
-  // ScreenshotController screenshotController = ScreenshotController();
-
   final List<bool> _dataExpansionPanel = [true, true];
 
   late TextEditingController _barcodeController;
@@ -59,48 +57,6 @@ class _PricingScreenState extends State<PricingScreen> {
     customTheme = AppTheme.customTheme;
     theme = AppTheme.theme;
   }
-
-  // void testPrint(
-  //     PrinterBluetooth printer, Uint8List theimageThatComesfr) async {
-  //   printerManager.selectPrinter(printer);
-  //
-  //   print("im inside the test print 2");
-  //   // TODO Don't forget to choose printer's paper size
-  //   const PaperSize paper = PaperSize.mm80;
-  //   final profile = await CapabilityProfile.load();
-  //   // final printer = Generator(paper, profile);
-  //
-  //   final PosPrintResult res =
-  //       await printerManager.printTicket(await demoReceipt(paper, profile));
-  //
-  //   if (res == PosPrintResult.success) {
-  //     // DEMO RECEIPT
-  //     // await testReceipt(printer, theimageThatComesfr);
-  //     print(res.msg);
-  //     await Future.delayed(const Duration(seconds: 3), () {
-  //       print("prinnter desconect");
-  //       printerManager.stopScan();
-  //     });
-  //   }
-  // }
-
-  // Future<List<int>> demoReceipt(
-  //     PaperSize paper, CapabilityProfile profile) async {
-  //   final Generator ticket = Generator(paper, profile);
-  //   List<int> bytes = [];
-  //
-  //   bytes += ticket.text('السلام عليكم',
-  //       styles: PosStyles(
-  //         align: PosAlign.center,
-  //         height: PosTextSize.size2,
-  //         width: PosTextSize.size2,
-  //       ),
-  //       linesAfter: 1);
-  //
-  //   ticket.feed(2);
-  //   ticket.cut();
-  //   return bytes;
-  // }
 
   Future<void> getItem() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -320,18 +276,6 @@ class _PricingScreenState extends State<PricingScreen> {
               FxButton.medium(
                   borderRadiusAll: 8,
                   onPressed: () {
-                    // screenshotController
-                    //     .capture(delay: const Duration(milliseconds: 10))
-                    //     .then((capturedImage) async {
-                    //   theimageThatComesfromThePrinter = capturedImage!;
-                    //   setState(() {
-                    //     theimageThatComesfromThePrinter = capturedImage;
-                    //     testPrint(_devices[0], theimageThatComesfromThePrinter);
-                    //   });
-                    // }).catchError((onError) {
-                    //   print(onError);
-                    // });
-
                     // validation();
 
                     // if (priceOffer.isEmpty) {
@@ -347,144 +291,6 @@ class _PricingScreenState extends State<PricingScreen> {
                     "print".tr(),
                     color: customTheme.OnPrimary,
                   )),
-
-              // const SizedBox(
-              //   height: 10,
-              // ),
-              // Screenshot(
-              //   controller: screenshotController,
-              //   child: Container(
-              //       width: 140,
-              //       child: Column(
-              //         children: [
-              //           Row(
-              //             children: const [
-              //               Text(
-              //                 "محمد نعم 臺灣  ",
-              //                 style: TextStyle(
-              //                     fontSize: 10, fontWeight: FontWeight.bold),
-              //               ),
-              //             ],
-              //             mainAxisAlignment: MainAxisAlignment.center,
-              //           ),
-              //           const Text("-----------------"),
-              //           Padding(
-              //             padding: const EdgeInsets.only(bottom: 20.0),
-              //             child: Row(
-              //               mainAxisAlignment: MainAxisAlignment.center,
-              //               children: const [
-              //                 Text(
-              //                   "(  汉字 )",
-              //                   style: TextStyle(
-              //                       fontSize: 10, fontWeight: FontWeight.bold),
-              //                 ),
-              //                 SizedBox(
-              //                   width: 2,
-              //                 ),
-              //                 Text(
-              //                   "رقم الطلب",
-              //                   style: TextStyle(
-              //                       fontSize: 10, fontWeight: FontWeight.bold),
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //           const SizedBox(
-              //             height: 20,
-              //             child: Text("-----------------------"),
-              //           ),
-              //           Row(
-              //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //             crossAxisAlignment: CrossAxisAlignment.start,
-              //             children: const [
-              //               Expanded(
-              //                 child: Center(
-              //                   child: Text(
-              //                     "التفاصيل",
-              //                     style: TextStyle(
-              //                         fontSize: 10,
-              //                         fontWeight: FontWeight.bold),
-              //                   ),
-              //                 ),
-              //                 flex: 6,
-              //               ),
-              //               Expanded(
-              //                 child: Center(
-              //                   child: Text(
-              //                     "السعر ",
-              //                     style: TextStyle(
-              //                         fontSize: 10,
-              //                         fontWeight: FontWeight.bold),
-              //                   ),
-              //                 ),
-              //                 flex: 2,
-              //               ),
-              //               Expanded(
-              //                 child: Center(
-              //                   child: Text(
-              //                     "العدد",
-              //                     style: TextStyle(
-              //                         fontSize: 10,
-              //                         fontWeight: FontWeight.bold),
-              //                   ),
-              //                 ),
-              //                 flex: 2,
-              //               ),
-              //             ],
-              //           ),
-              //           ListView.builder(
-              //             scrollDirection: Axis.vertical,
-              //             shrinkWrap: true,
-              //             physics: const ScrollPhysics(),
-              //             itemCount: 1,
-              //             itemBuilder: (context, index) {
-              //               return Card(
-              //                 child: Row(
-              //                   mainAxisAlignment:
-              //                       MainAxisAlignment.spaceBetween,
-              //                   crossAxisAlignment: CrossAxisAlignment.start,
-              //                   children: const [
-              //                     Expanded(
-              //                       child: Center(
-              //                         child: Text(
-              //                           "臺灣",
-              //                           style: TextStyle(fontSize: 10),
-              //                         ),
-              //                       ),
-              //                       flex: 6,
-              //                     ),
-              //                     Expanded(
-              //                       child: Center(
-              //                         child: Text(
-              //                           "تجربة عيوني انتة ",
-              //                           style: TextStyle(fontSize: 10),
-              //                         ),
-              //                       ),
-              //                       flex: 2,
-              //                     ),
-              //                     Expanded(
-              //                       child: Center(
-              //                         child: Text(
-              //                           "Test",
-              //                           style: TextStyle(fontSize: 10),
-              //                         ),
-              //                       ),
-              //                       flex: 2,
-              //                     ),
-              //                   ],
-              //                 ),
-              //               );
-              //             },
-              //           ),
-              //           const Text("----------"),
-              //         ],
-              //       )),
-              // ),
-              // const SizedBox(
-              //   height: 25,
-              // ),
-
-              // FxSpacing.height(16),
               (readOnly)
                   ? Container()
                   : Container(

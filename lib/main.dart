@@ -147,29 +147,24 @@ Future<void> isUpdate() async {
 
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
+  preferences.setString(
+      ConfigSharedPreferences.version, packageInfo.version.toString());
+
   await requirements("com.masera.khh_barcodeprint").then((value) {
     preferences.setString(
         ConfigSharedPreferences.barcodePrint, jsonEncode(value));
-  });
-
-  await requirements("com.google.android.gms").then((value) {
-    preferences.setString(ConfigSharedPreferences.gms, jsonEncode(value));
   });
 
   Map<String, dynamic> barcodePrintInfo =
       jsonDecode(preferences.getString(ConfigSharedPreferences.barcodePrint)!)
           as Map<String, dynamic>;
 
-  Map<String, dynamic> gmsInfo =
-      jsonDecode(preferences.getString(ConfigSharedPreferences.gms)!)
-          as Map<String, dynamic>;
-
   if (response.statusCode == 200) {
     var responseBody = json.decode(response.body);
 
-    if ((barcodePrintInfo["exists"] == true &&
-            barcodePrintInfo["is_enable"] == true) &&
-        (gmsInfo["exists"] == true && gmsInfo["is_enable"] == true)) {
+    if (barcodePrintInfo["exists"] == true &&
+        barcodePrintInfo["is_enable"] == true) {
+
       if (responseBody["data"][0] != null) {
         Version currentVersion = Version.parse(packageInfo.version.toString());
         Version latestVersion =
@@ -180,9 +175,11 @@ Future<void> isUpdate() async {
         } else {
           loadView = await isLogin();
         }
+
       } else {
         loadView = await isLogin();
       }
+
     } else {
       loadView = Screens.requirements.value;
     }

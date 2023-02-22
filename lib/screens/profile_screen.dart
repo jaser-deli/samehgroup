@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
@@ -19,6 +20,7 @@ import 'package:samehgroup/theme/theme_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+import 'package:version/version.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -33,6 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   bool isDark = false;
 
+  String version = "";
   String username = "";
   String branchNo = "";
 
@@ -50,6 +53,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Map<String, dynamic> userInfo =
         jsonDecode(preferences.getString(ConfigSharedPreferences.userInfo)!)
             as Map<String, dynamic>;
+
+    version = preferences.getString(ConfigSharedPreferences.version)!;
 
     setState(() {
       username = userInfo["user_name"];
@@ -224,8 +229,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     InkWell(
                       onTap: () {
                         Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (_) => const PrintScreen()),
+                          MaterialPageRoute(builder: (_) => PrintScreen()),
                         );
                       },
                       highlightColor: Colors.transparent,
@@ -273,6 +277,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         'logout'.tr(),
                         color: customTheme.OnPrimary,
                       ),
+                    )),
+                    FxSpacing.height(10),
+                    Center(
+                        child: FxText.bodySmall(
+                      "v-$version".tr(),
+                      color: customTheme.Primary,
+                      textDirection: TextDirection.ltr,
+                      letterSpacing: 0,
                     ))
                   ],
                 )),

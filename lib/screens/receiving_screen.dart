@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_holo_date_picker/flutter_holo_date_picker.dart';
@@ -54,23 +53,9 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
   String itemName = "";
   String itemEquivelentQty = "";
 
-  // late CameraDescription _cameraDescription;
-  // List<String> _images = [];
-
   @override
   void initState() {
     super.initState();
-    // availableCameras().then((cameras) {
-    //   final camera = cameras
-    //       .where((camera) => camera.lensDirection == CameraLensDirection.back)
-    //       .toList()
-    //       .first;
-    //   setState(() {
-    //     _cameraDescription = camera;
-    //   });
-    // }).catchError((err) {
-    //   print(err);
-    // });
 
     _orderController = TextEditingController();
     _barcodeController = TextEditingController();
@@ -480,33 +465,10 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                     child: FxTextField(
                       controller: _itemQtyController,
                       cursorColor: customTheme.Primary,
-                      // readOnly: readOnlyQuantity,
                       style: TextStyle(color: customTheme.Primary),
                       keyboardType: TextInputType.phone,
                       maxLines: 1,
-                      onTap: () async {
-                        // if (_barcodeController.text.isEmpty) {
-                        //   setState(() {
-                        //     readOnlyQuantity = true;
-                        //   });
-                        //
-                        //   AwesomeDialog(
-                        //       context: context,
-                        //       dialogType: DialogType.error,
-                        //       animType: AnimType.BOTTOMSLIDE,
-                        //       title: 'error'.tr(),
-                        //       desc: 'p_e_barcode_no'.tr(),
-                        //       btnOkText: 'ok'.tr(),
-                        //       btnOkOnPress: () {})
-                        //       .show();
-                        // } else {
-                        //   setState(() {
-                        //     readOnlyQuantity = false;
-                        //   });
-                        //   await getItem();
-                        //   await returnCheck(branchNo, itemNo, supplierNo);
-                        // }
-                      },
+                      onTap: () async {},
                       decoration: InputDecoration(
                           prefixIcon: Icon(Icons.production_quantity_limits,
                               color: customTheme.Primary),
@@ -547,33 +509,10 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                     child: FxTextField(
                       controller: _itemPriceController,
                       cursorColor: customTheme.Primary,
-                      // readOnly: readOnlyQuantity,
                       style: TextStyle(color: customTheme.Primary),
                       keyboardType: TextInputType.phone,
                       maxLines: 1,
-                      onTap: () async {
-                        // if (_barcodeController.text.isEmpty) {
-                        //   setState(() {
-                        //     readOnlyQuantity = true;
-                        //   });
-                        //
-                        //   AwesomeDialog(
-                        //       context: context,
-                        //       dialogType: DialogType.error,
-                        //       animType: AnimType.BOTTOMSLIDE,
-                        //       title: 'error'.tr(),
-                        //       desc: 'p_e_barcode_no'.tr(),
-                        //       btnOkText: 'ok'.tr(),
-                        //       btnOkOnPress: () {})
-                        //       .show();
-                        // } else {
-                        //   setState(() {
-                        //     readOnlyQuantity = false;
-                        //   });
-                        //   await getItem();
-                        //   await returnCheck(branchNo, itemNo, supplierNo);
-                        // }
-                      },
+                      onTap: () async {},
                       decoration: InputDecoration(
                           prefixIcon: Icon(Icons.payments_outlined,
                               color: customTheme.Primary),
@@ -620,7 +559,6 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                     child: FxTextField(
                       controller: _invQtyController,
                       cursorColor: customTheme.Primary,
-                      // readOnly: readOnlyQuantity,
                       style: TextStyle(color: customTheme.Primary),
                       keyboardType: TextInputType.phone,
                       maxLines: 1,
@@ -725,64 +663,16 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
               FxButton.medium(
                   borderRadiusAll: 8,
                   onPressed: () async {
-                    // final String? imagePath =
-                    //     await Navigator.of(context).push(MaterialPageRoute(
-                    //         builder: (_) => CameraScreen(
-                    //               camera: _cameraDescription,
-                    //             )));
-
-                    // print('imagepath: $imagePath');
-
-                    // if (imagePath != null) {
-                    //   setState(() {
-                    //     _images.add(imagePath);
-                    //   });
-                    // }
-
-                    // if (double.parse(_quantityReservedController.text) > 0) {
-                    //   AwesomeDialog(
-                    //       context: context,
-                    //       dialogType: DialogType.error,
-                    //       animType: AnimType.BOTTOMSLIDE,
-                    //       title: 'error'.tr(),
-                    //       desc: 't_i_is_p_a_p_a_or_c_t_t'.tr(),
-                    //       btnOkText: 'ok'.tr(),
-                    //       btnOkOnPress: () {})
-                    //       .show();
-                    // } else if (double.parse(_quantityDestroyController.text) >
-                    //     quantityDestroy) {
-                    //   AwesomeDialog(
-                    //       context: context,
-                    //       dialogType: DialogType.error,
-                    //       animType: AnimType.BOTTOMSLIDE,
-                    //       title: 'error'.tr(),
-                    //       desc: 't_r_q_is_g_t_t_c_q'.tr(),
-                    //       btnOkText: 'ok'.tr(),
-                    //       btnOkOnPress: () {})
-                    //       .show();
-                    // } else {
-                    //   save(
-                    //       supplierNo.toString(),
-                    //       branchNo.toString(),
-                    //       itemNo.toString(),
-                    //       _barcodeController.text,
-                    //       itemEquivelentQty,
-                    //       _quantityDestroyController.text);
-                    // }
-                    //
-                    // setState(() {
-                    //   readOnlyBarcode = true;
-                    //   readOnlyQuantity = true;
-                    // });
-                    //
-                    // _supplierController.clear();
-                    // _barcodeController.clear();
-                    // _quantityDestroyController.clear();
-                    // _quantityReservedController.clear();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (_) => CameraScreen(
+                                number: _orderController.text,
+                              )),
+                    );
                   },
                   backgroundColor: customTheme.Primary,
                   child: FxText.labelLarge(
-                    "صورة الفاتورة".tr(),
+                    "صور الفواتير".tr(),
                     color: customTheme.OnPrimary,
                   )),
               FxSpacing.height(16),

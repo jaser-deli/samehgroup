@@ -150,38 +150,20 @@ Future<void> isUpdate() async {
   preferences.setString(
       ConfigSharedPreferences.version, packageInfo.version.toString());
 
-  await requirements("com.masera.khh_barcodeprint").then((value) {
-    preferences.setString(
-        ConfigSharedPreferences.barcodePrint, jsonEncode(value));
-  });
-
-  Map<String, dynamic> barcodePrintInfo =
-      jsonDecode(preferences.getString(ConfigSharedPreferences.barcodePrint)!)
-          as Map<String, dynamic>;
-
   if (response.statusCode == 200) {
     var responseBody = json.decode(response.body);
+    if (responseBody["data"][0] != null) {
+      Version currentVersion = Version.parse(packageInfo.version.toString());
+      Version latestVersion =
+          Version.parse(responseBody["data"][0]["version"].toString());
 
-    if (barcodePrintInfo["exists"] == true &&
-        barcodePrintInfo["is_enable"] == true) {
-
-      if (responseBody["data"][0] != null) {
-        Version currentVersion = Version.parse(packageInfo.version.toString());
-        Version latestVersion =
-            Version.parse(responseBody["data"][0]["version"].toString());
-
-        if (latestVersion > currentVersion) {
-          loadView = Screens.update.value;
-        } else {
-          loadView = await isLogin();
-        }
-
+      if (latestVersion > currentVersion) {
+        loadView = Screens.update.value;
       } else {
         loadView = await isLogin();
       }
-
     } else {
-      loadView = Screens.requirements.value;
+      loadView = await isLogin();
     }
   }
 }
@@ -193,14 +175,28 @@ Future<String> isLogin() async {
   bool isLangSelect =
       preferences.getBool(ConfigSharedPreferences.isLangSelect) ?? false;
 
-  if (isLangSelect == false) {
-    return Screens.language.value;
-  } else if (token != "" && token != null) {
-    locale = await getLanguage();
-    return Screens.main.value;
+  await requirements("com.masera.khh_barcodeprint").then((value) {
+    preferences.setString(
+        ConfigSharedPreferences.barcodePrint, jsonEncode(value));
+  });
+
+  Map<String, dynamic> barcodePrintInfo =
+      jsonDecode(preferences.getString(ConfigSharedPreferences.barcodePrint)!)
+          as Map<String, dynamic>;
+
+  if (barcodePrintInfo["exists"] == true &&
+      barcodePrintInfo["is_enable"] == true) {
+    if (isLangSelect == false) {
+      return Screens.language.value;
+    } else if (token != "" && token != null) {
+      locale = await getLanguage();
+      return Screens.main.value;
+    } else {
+      locale = await getLanguage();
+      return Screens.login.value;
+    }
   } else {
-    locale = await getLanguage();
-    return Screens.login.value;
+    return Screens.requirements.value;
   }
 }
 

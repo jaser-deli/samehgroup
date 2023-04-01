@@ -17,7 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 6.0.0+6
+version: 10.0.0+10
 
 environment:
   sdk: '>=2.18.2 <3.0.0'
@@ -42,21 +42,25 @@ dependencies:
       url: https://github.com/Aksoyhlc/jiffy.git
       ref: master
 
+  flutter_cblue:
+    git:
+      url: https://github.com/gmeles/flutter_cblue.git
+      ref: master
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.5
-  intl: ^0.18.0
+  #  jiffy: ^6.0.0
   bottom_navy_bar: ^6.0.0
   flutter_feather_icons: ^2.0.0+1
   provider: ^6.0.5
   material_design_icons_flutter: ^5.0.6996
   awesome_bottom_bar: ^1.2.1
-  url_launcher: ^6.1.6
+  url_launcher: ^6.1.10
   mobile_scanner: ^2.1.0
   fluttertoast: ^8.1.2
   top_snackbar_flutter: ^3.0.0
   http: ^0.13.5
-  dio: ^5.0.0
   shared_preferences: ^2.0.17
   awesome_dialog: ^3.0.2
   awesome_icons: ^1.1.0
@@ -75,6 +79,17 @@ dependencies:
   restart_app: ^1.1.2
   flutter_phoenix: ^1.1.0
   bluetooth_connector: ^0.0.3
+  flutter_downloader: ^1.10.2
+  permission_handler: ^10.2.0
+  path_provider: ^2.0.13
+  open_file: ^3.2.1
+  flutter_blue: ^0.8.0
+
+dependency_overrides:
+  intl: ^0.17.0
+  ffi: ^2.0.1
+
+
 
 
 flutter_native_splash:

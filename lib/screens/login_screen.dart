@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
@@ -257,7 +258,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     FxSpacing.width(12),
                     InkWell(
                       onTap: () {
-                        launch("tel://+962786322012");
+                        launch("tel://+962786322012").catchError((error) {
+                          AwesomeDialog(
+                                  context: context,
+                                  dialogType: DialogType.info,
+                                  animType: AnimType.BOTTOMSLIDE,
+                                  title: 'الدعم الفني'.tr(),
+                                  desc: '0786322012'.tr(),
+                                  btnOkText: 'ok'.tr(),
+                                  dismissOnTouchOutside: false,
+                                  btnOkOnPress: () {})
+                              .show();
+                        });
                       },
                       child: FxText.bodySmall(
                         "help".tr(),

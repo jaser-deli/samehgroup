@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui' as ui;
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:flutx/widgets/button/button.dart';
 import 'package:flutx/widgets/text/text.dart';
@@ -111,7 +112,18 @@ class _UpdateScreenState extends State<UpdateScreen> {
                   FxSpacing.width(12),
                   InkWell(
                     onTap: () {
-                      launch("tel://+962786322012");
+                      launch("tel://+962786322012").catchError((error) {
+                        AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.info,
+                                animType: AnimType.BOTTOMSLIDE,
+                                title: 'الدعم الفني'.tr(),
+                                desc: '0786322012'.tr(),
+                                btnOkText: 'ok'.tr(),
+                                dismissOnTouchOutside: false,
+                                btnOkOnPress: () {})
+                            .show();
+                      });
                     },
                     child: FxText.bodySmall(
                       "help".tr(),

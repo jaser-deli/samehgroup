@@ -83,15 +83,19 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
         itemName = responseBody["data"]["item_name"];
         itemEquivelentQty = responseBody["data"]["itm_equivelent_qty"];
       } else {
-        clearFiled();
+        setState(() {
+          readOnly = true;
+        });
 
-        showTopSnackBar(
-          Overlay.of(context),
-          CustomSnackBar.error(
-            message: 'رقم الباركود غير مشمول في طلب الشراء'.tr(),
-            // رقم الباركود غير مشمول في طلب الشراء
-          ),
-        );
+        // clearFiled();
+        //
+        // showTopSnackBar(
+        //   Overlay.of(context),
+        //   CustomSnackBar.error(
+        //     message: 'رقم الباركود غير مشمول في طلب الشراء'.tr(),
+        //     // رقم الباركود غير مشمول في طلب الشراء
+        //   ),
+        // );
       }
     }
   }
@@ -316,9 +320,12 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                     setState(() {});
                     Future.delayed(Duration(seconds: 2)).whenComplete(() async {
                       _isWriting = false;
-                      setState(() {
-                        readOnly = false;
-                      });
+                      if (_barcodeController.text.isNotEmpty) {
+                        setState(() {
+                          readOnly = false;
+                        });
+                      }
+
                       await getItem();
                       setState(() {});
                     });
@@ -620,9 +627,10 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                           looping: false,
                         ).then((value) {
                           if (value != null) {
-                            var result = DateFormat('dd/MM/yyy').format(value);
+                            var result = DateFormat('yyy/MM/dd').format(value);
                             setState(() {
                               _dateController.text = result;
+                              print(_dateController.text);
                             });
                           }
                         });
@@ -680,7 +688,6 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                   borderRadiusAll: 8,
                   onPressed: () {
                     if (_barcodeController.text.isNotEmpty) {
-                      print(_dateController.text);
                       save(
                           _orderController.text,
                           periodNo,
@@ -749,6 +756,10 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
 
   void clearFiledCustom() {
     _barcodeController.clear();
+    _invQtyController.clear();
+    _itemPriceController.clear();
+    _itemQtyController.clear();
+    _dateController.clear();
 
     _orderFocusNode.requestFocus();
 

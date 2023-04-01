@@ -5,8 +5,10 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/scheduler.dart' as schedulerBinding;
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/config/screens.dart';
@@ -57,6 +59,7 @@ void notificationTapBackground(NotificationResponse notificationResponse) {
 Future<void> main() async {
   //You will need to initialize AppThemeNotifier class for theme changes.
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp();
 
   messaging = FirebaseMessaging.instance;

@@ -1,5 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:samehgroup/extensions/string.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class CardPicture extends StatelessWidget {
   CardPicture({this.onTap, this.imagePath});
@@ -39,7 +42,12 @@ class CardPicture extends StatelessWidget {
                     ]),
                 child: IconButton(
                     onPressed: () {
-                      print('icon press');
+                      showTopSnackBar(
+                        Overlay.of(context),
+                        CustomSnackBar.error(
+                          message: 'لايمكن حذف الصورة حاليأ'.tr(),
+                        ),
+                      );
                     },
                     icon: Icon(Icons.delete, color: Colors.white)),
               )
@@ -62,7 +70,7 @@ class CardPicture extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Attach Picture',
+                  'أرفاق صورة',
                   style: TextStyle(fontSize: 17.0, color: Colors.grey[600]),
                 ),
                 Icon(

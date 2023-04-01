@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/config/images.dart';
@@ -88,8 +91,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await preferences.clear();
     await FirebaseMessaging.instance.deleteToken();
 
-    Navigator.pushNamedAndRemoveUntil(
-        context, Screens.language.value, (Route<dynamic> route) => false);
+    if (Platform.isAndroid) {
+      Restart.restartApp();
+    } else {
+      Phoenix.rebirth(context);
+    }
   }
 
   void changeTheme() {
@@ -303,7 +309,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         FxSpacing.width(12),
                         InkWell(
                           onTap: () {
-                            launch("tel://+962786322012");
+                            launch("tel://+962786322012").catchError((error) {
+                              AwesomeDialog(
+                                      context: context,
+                                      dialogType: DialogType.info,
+                                      animType: AnimType.BOTTOMSLIDE,
+                                      title: 'الدعم الفني'.tr(),
+                                      desc: '0786322012'.tr(),
+                                      btnOkText: 'ok'.tr(),
+                                      dismissOnTouchOutside: false,
+                                      btnOkOnPress: () {})
+                                  .show();
+                            });
                           },
                           child: FxText.bodySmall(
                             "help".tr(),

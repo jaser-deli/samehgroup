@@ -147,7 +147,7 @@ class _TransferFromStoreState extends State<TransferFromStore> {
         showTopSnackBar(
           Overlay.of(context),
           CustomSnackBar.error(
-            message: 'p_c_t_b_n_e'.tr(),
+            message: 'الصنف مكفول او لايوجد رصيد لأتمام العملية'.tr(),
           ),
         );
       }

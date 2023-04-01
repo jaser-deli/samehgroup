@@ -45,6 +45,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
   // information Data Set
   String supplierName = "";
   String supplierNo = "";
+
   String branchNo = "";
   String itemNo = "";
   String itemName = "";
@@ -76,10 +77,8 @@ class _ReturnScreenState extends State<ReturnScreen> {
     });
   }
 
-  Future getSupplier(
-    String supplierNo,
-  ) async {
-    var response = await http.get(Uri.parse("${Api.supplier}/$supplierNo"));
+  Future getSupplier(String _supplierNo) async {
+    var response = await http.get(Uri.parse("${Api.supplier}/$_supplierNo"));
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
 
@@ -88,6 +87,8 @@ class _ReturnScreenState extends State<ReturnScreen> {
           supplierName = responseBody["data"]["supp_name_a"];
           supplierNo = responseBody["data"]["supp_no"];
         });
+
+        print(supplierNo);
       } else {
         clearFiled();
 
@@ -128,7 +129,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
         itemName = responseBody["data"]["item_name"];
         itemEquivelentQty = responseBody["data"]["itm_equivelent_qty"];
       } else {
-        clearFiled();
+        clearFiledCustom();
 
         showTopSnackBar(
           Overlay.of(context),
@@ -681,7 +682,7 @@ class _ReturnScreenState extends State<ReturnScreen> {
                       borderRadiusAll: 8,
                       onPressed: () {
                         clear(
-                            supplierNo.toString(),
+                            _supplierController.text,
                             branchNo.toString(),
                             itemNo.toString(),
                             _barcodeController.text,
@@ -714,14 +715,14 @@ class _ReturnScreenState extends State<ReturnScreen> {
         );
       } else {
         save(
-            supplierNo.toString(),
+            supplierNo,
             branchNo.toString(),
             itemNo.toString(),
             _barcodeController.text,
             itemEquivelentQty,
             _quantityDestroyController.text);
 
-        clearFiledCustom();
+        clearFiled();
       }
     } else {
       validationField(_barcodeController.text, 'p_e_barcode_no',
@@ -753,10 +754,10 @@ class _ReturnScreenState extends State<ReturnScreen> {
   }
 
   void clearFiled() {
-    _supplierController.clear();
     _barcodeController.clear();
     _quantityDestroyController.clear();
     _quantityReservedController.clear();
+    _quantityController.clear();
 
     _supplierFocusNode.requestFocus();
 

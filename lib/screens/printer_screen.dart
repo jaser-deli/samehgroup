@@ -1,6 +1,10 @@
+import 'dart:convert' show utf8;
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:bluetooth_connector/bluetooth_connector.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_cblue/flutter_cblue.dart';
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/config/style.dart';
@@ -27,6 +31,8 @@ class _PrintScreenState extends State<PrintScreen> {
   List<BtDevice> devicesList = [];
   String address = "";
 
+  FlutterBlue flutterBlue = FlutterBlue.instance;
+
   @override
   void initState() {
     super.initState();
@@ -51,6 +57,17 @@ class _PrintScreenState extends State<PrintScreen> {
 
     deviceList();
     getAddressConnection();
+  }
+
+
+
+
+  // String greekString = '! U1 setvar "device.languages" "zpl"' +
+  //     '! U1 setvar "device.pnp_option" "zpl"' +
+  //     '! U1 do "device.reset" "" <CR>';
+
+  void printBT(String _str) async {
+    print(await FlutterCblue.printToBT(printStr: _str)); // default logType
   }
 
   Future<void> deviceList() async {
@@ -238,7 +255,10 @@ class _PrintScreenState extends State<PrintScreen> {
                 margin: paddingHorizontal.add(paddingVerticalMedium),
                 child: FxButton.medium(
                     borderRadiusAll: 8,
-                    onPressed: printTest,
+                    // onPressed: printTest, //printTest,
+                    onPressed: () {
+                      printBT(greekString);
+                    }, //printTest,
                     backgroundColor: customTheme.Primary,
                     child: FxText.labelLarge(
                       'Print Test'.tr(),

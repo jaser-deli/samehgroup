@@ -1,9 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/config/style.dart';
 import 'package:samehgroup/extensions/string.dart';
@@ -28,6 +33,9 @@ class _RequirementsState extends State<Requirements> {
   bool barcodePrint = false;
   bool isEnableBarcodePrint = false;
 
+  String url =
+      "http://ls.samehgroup.com:8081/LiveSales_old_new/public/storage/apps/KHH_BarcodePrint.apk";
+
   @override
   void initState() {
     super.initState();
@@ -35,6 +43,9 @@ class _RequirementsState extends State<Requirements> {
     theme = AppTheme.theme;
 
     loadRequirements();
+
+    // openAPK();
+    initFlutterDownloader();
   }
 
   Future loadRequirements() async {
@@ -48,6 +59,23 @@ class _RequirementsState extends State<Requirements> {
       barcodePrint = barcodePrintInfo["exists"];
       isEnableBarcodePrint = barcodePrintInfo["is_enable"];
     });
+  }
+
+  // Future<void> openAPK() async {
+  //   OpenFile.open("/storage/emulated/0/Android/data/com.samehgroup.samehgroup/files/KHH_BarcodePrint.apk");
+  // }
+
+  Future<void> initFlutterDownloader() async {
+    // await OpenFilex.open(
+    //     "${(await getExternalStorageDirectory())!.path}/KHH_BarcodePrint.apk");
+
+    await Permission.storage.request();
+
+    await FlutterDownloader.initialize(
+        debug: true, // optional: set false to disable printing logs to console
+        ignoreSsl: true);
+
+    FlutterDownloader.registerCallback(Download.callback);
   }
 
   @override
@@ -84,9 +112,22 @@ class _RequirementsState extends State<Requirements> {
                         padding: const EdgeInsets.only(top: 10),
                         children: [
                           InkWell(
-                            onTap: () {
-                              launch(
-                                  "https://drive.google.com/file/d/1p5npm7BXCT8p5n46h3DzIcBHyod0ziIb/view?usp=sharing");
+                            onTap: () async {
+                              print("onDownloadStart $url");
+                              final taskId = await FlutterDownloader.enqueue(
+                                url: url.toString(),
+                                savedDir:
+                                    (await getExternalStorageDirectory())!.path,
+                                showNotification: true,
+                                // show download progress in status bar (for Android)
+                                openFileFromNotification:
+                                    true, // click on notification to open downloaded file (for Android)
+                              );
+
+                              // if (taskId != null) {
+                              //   await OpenFilex.open(
+                              //       "${(await getExternalStorageDirectory())!.path}/KHH_BarcodePrint.apk");
+                              // }
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(
@@ -188,5 +229,12 @@ class _RequirementsState extends State<Requirements> {
         ),
       );
     });
+  }
+}
+
+class Download {
+  static void callback(String id, DownloadTaskStatus status, int progress) {
+    print("Status => $status");
+    print("Progress => $progress");
   }
 }

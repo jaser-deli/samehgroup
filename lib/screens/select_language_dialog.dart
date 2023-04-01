@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutx/flutx.dart';
+import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/localizations/language.dart';
 import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SelectLanguageDialog extends StatefulWidget {
   const SelectLanguageDialog({Key? key}) : super(key: key);
@@ -23,7 +25,27 @@ class _SelectLanguageDialogState extends State<SelectLanguageDialog> {
   initState() {
     customTheme = AppTheme.customTheme;
 
+    init();
     super.initState();
+  }
+
+  Future init() async {
+    currentLanguage = await getLanguage();
+  }
+
+  Future<Language> getLanguage() async {
+    Language? language;
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? langCode =
+        sharedPreferences.getString(ConfigSharedPreferences.langCode);
+
+    if (langCode != null) {
+      setState(() {
+        language = Language.findFromLocale(Locale(langCode));
+      });
+    }
+
+    return language ?? languages.first;
   }
 
   Future<void> handleRadioValueChange(Language language) async {

@@ -142,7 +142,7 @@ class SinglePageItem extends StatelessWidget {
             children: <Widget>[
               iconWidget,
               Container(
-                margin: const EdgeInsets.only(top: 16),
+                margin: const EdgeInsets.only(top: 10),
                 child:
                     FxText.bodyMedium(title!, fontWeight: 600, color: textColor, textAlign: TextAlign.center,),
               )

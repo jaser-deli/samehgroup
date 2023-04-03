@@ -133,8 +133,6 @@ class _PrintScreenState extends State<PrintScreen> {
         print('Device: ${d.friendlyName} [${d.mac}]');
       });
     } catch (e) {
-      // showDialog(context: context, child: Text(e));
-      //throw e;
       print('Error:$e');
     }
 
@@ -145,7 +143,7 @@ class _PrintScreenState extends State<PrintScreen> {
     });
   }
 
-  String levelText = "Querying...";
+  String levelText = "الرجاء الانتظار...";
 
   _level(ZebraBluetoothDevice d) {
     d.batteryLevel().then((t) {
@@ -159,9 +157,11 @@ class _PrintScreenState extends State<PrintScreen> {
     List<Widget> items = [];
 
     if (_devices.length < 1) {
-      items.add(ListTile(
-        title: Text("Not found any or still searching"),
-      ));
+      Center(
+        child: CircularProgressIndicator(
+          color: customTheme.Primary,
+        ),
+      );
     } else {
       items.addAll([
         ListTile(

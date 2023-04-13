@@ -216,6 +216,38 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
     getBranches();
   }
 
+  void presentLoader(BuildContext context,
+      {String text = 'الرجاء الأنتظار لحظات...',
+      bool barrierDismissible = false,
+      bool willPop = true}) {
+    showDialog(
+        barrierDismissible: barrierDismissible,
+        context: context,
+        builder: (c) {
+          return WillPopScope(
+            onWillPop: () async {
+              return willPop;
+            },
+            child: AlertDialog(
+              content: Container(
+                child: Row(
+                  children: <Widget>[
+                    CircularProgressIndicator(),
+                    SizedBox(
+                      width: 20.0,
+                    ),
+                    Text(
+                      text,
+                      style: TextStyle(fontSize: 18.0),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<AppNotifier>(
@@ -498,7 +530,10 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
                       readOnlyTransferQ = false;
                     });
 
-                    getItemBarcode();
+                    presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
+                    getItemBarcode()
+                        .whenComplete(() => Navigator.of(context).pop());
                   }
                 },
                 decoration: InputDecoration(
@@ -678,8 +713,10 @@ class _TransferFromBranchState extends State<TransferFromBranch> {
         clearFieldCustom();
       }
     } else {
-      validationField(
-          _barcodeController.text, 'p_e_barcode_no', getItemBarcode());
+      presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
+      validationField(_barcodeController.text, 'p_e_barcode_no',
+          getItemBarcode().whenComplete(() => Navigator.of(context).pop()));
     }
   }
 

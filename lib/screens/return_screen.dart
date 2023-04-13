@@ -171,7 +171,9 @@ class _ReturnScreenState extends State<ReturnScreen> {
           ),
         );
       } else {
-        await getItem();
+        presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
+        await getItem().whenComplete(() => Navigator.of(context).pop());
       }
     }
   }
@@ -258,6 +260,38 @@ class _ReturnScreenState extends State<ReturnScreen> {
         );
       }
     }
+  }
+
+  void presentLoader(BuildContext context,
+      {String text = 'الرجاء الأنتظار لحظات...',
+      bool barrierDismissible = false,
+      bool willPop = true}) {
+    showDialog(
+        barrierDismissible: barrierDismissible,
+        context: context,
+        builder: (c) {
+          return WillPopScope(
+            onWillPop: () async {
+              return willPop;
+            },
+            child: AlertDialog(
+              content: Container(
+                child: Row(
+                  children: <Widget>[
+                    CircularProgressIndicator(),
+                    SizedBox(
+                      width: 20.0,
+                    ),
+                    Text(
+                      text,
+                      style: TextStyle(fontSize: 18.0),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
   }
 
   @override
@@ -388,8 +422,13 @@ class _ReturnScreenState extends State<ReturnScreen> {
                 keyboardType: TextInputType.phone,
                 maxLines: 1,
                 onTap: () {
-                  validationField(_supplierController.text, 'p_e_supplier_no',
-                      getSupplier(_supplierController.text));
+                  presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
+                  validationField(
+                      _supplierController.text,
+                      'p_e_supplier_no',
+                      getSupplier(_supplierController.text)
+                          .whenComplete(() => Navigator.of(context).pop()));
                 },
                 decoration: InputDecoration(
                     prefixIcon: IconButton(
@@ -546,7 +585,10 @@ class _ReturnScreenState extends State<ReturnScreen> {
                     setState(() {
                       readOnlyQuantity = false;
                     });
-                    await getItem();
+                    presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
+                    await getItem()
+                        .whenComplete(() => Navigator.of(context).pop());
                     await returnCheck(branchNo, itemNo, supplierNo);
                   }
                 },
@@ -725,8 +767,13 @@ class _ReturnScreenState extends State<ReturnScreen> {
         clearFiled();
       }
     } else {
-      validationField(_barcodeController.text, 'p_e_barcode_no',
-          getSupplier(_supplierController.text));
+      presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
+      validationField(
+          _barcodeController.text,
+          'p_e_barcode_no',
+          getSupplier(_supplierController.text)
+              .whenComplete(() => Navigator.of(context).pop()));
     }
   }
 

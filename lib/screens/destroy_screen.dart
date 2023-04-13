@@ -196,6 +196,38 @@ class _DestroyScreenState extends State<DestroyScreen> {
     }
   }
 
+  void presentLoader(BuildContext context,
+      {String text = 'الرجاء الأنتظار لحظات...',
+      bool barrierDismissible = false,
+      bool willPop = true}) {
+    showDialog(
+        barrierDismissible: barrierDismissible,
+        context: context,
+        builder: (c) {
+          return WillPopScope(
+            onWillPop: () async {
+              return willPop;
+            },
+            child: AlertDialog(
+              content: Container(
+                child: Row(
+                  children: <Widget>[
+                    CircularProgressIndicator(),
+                    SizedBox(
+                      width: 20.0,
+                    ),
+                    Text(
+                      text,
+                      style: TextStyle(fontSize: 18.0),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<AppNotifier>(
@@ -264,7 +296,10 @@ class _DestroyScreenState extends State<DestroyScreen> {
                         scanBarcode(context).whenComplete(() async {
                           if (_barcodeController.text.isNotEmpty) {
                             _quantityDestroyFocusNode.requestFocus();
-                            await getItem();
+                            presentLoader(context,
+                                text: 'الرجاء الأنتظار لحظات...');
+                            await getItem().whenComplete(
+                                () => Navigator.of(context).pop());
                           }
                         });
                       },
@@ -402,8 +437,13 @@ class _DestroyScreenState extends State<DestroyScreen> {
                 keyboardType: TextInputType.phone,
                 maxLines: 1,
                 onTap: () {
+                  presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
                   validationField(
-                      _barcodeController.text, 'p_e_barcode_no', getItem());
+                      _barcodeController.text,
+                      'p_e_barcode_no',
+                      getItem()
+                          .whenComplete(() => Navigator.of(context).pop()));
                 },
                 decoration: InputDecoration(
                     prefixIcon: Icon(Icons.production_quantity_limits,
@@ -575,7 +615,10 @@ class _DestroyScreenState extends State<DestroyScreen> {
         clearFiled();
       }
     } else {
-      validationField(_barcodeController.text, 'p_e_barcode_no', getItem());
+      presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
+      validationField(_barcodeController.text, 'p_e_barcode_no',
+          getItem().whenComplete(() => Navigator.of(context).pop()));
 
       // الرجاء التاكد ان الصنف محول على التوالف
       // ويوجد له كميه

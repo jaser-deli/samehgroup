@@ -178,6 +178,38 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
     }
   }
 
+  void presentLoader(BuildContext context,
+      {String text = 'الرجاء الأنتظار لحظات...',
+      bool barrierDismissible = false,
+      bool willPop = true}) {
+    showDialog(
+        barrierDismissible: barrierDismissible,
+        context: context,
+        builder: (c) {
+          return WillPopScope(
+            onWillPop: () async {
+              return willPop;
+            },
+            child: AlertDialog(
+              content: Container(
+                child: Row(
+                  children: <Widget>[
+                    CircularProgressIndicator(),
+                    SizedBox(
+                      width: 20.0,
+                    ),
+                    Text(
+                      text,
+                      style: TextStyle(fontSize: 18.0),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<AppNotifier>(
@@ -311,8 +343,13 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                 keyboardType: TextInputType.phone,
                 maxLines: 1,
                 onTap: () {
-                  validationField(_orderController.text,
-                      'الرجاء ادخل رقم امر الشراء', getSupplier());
+                  presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
+                  validationField(
+                      _orderController.text,
+                      'الرجاء ادخل رقم امر الشراء',
+                      getSupplier()
+                          .whenComplete(() => Navigator.of(context).pop()));
                 },
                 onChanged: (text) {
                   if (!_isWriting) {
@@ -326,7 +363,10 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                         });
                       }
 
-                      await getItem();
+                      presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
+                      await getItem()
+                          .whenComplete(() => Navigator.of(context).pop());
                       setState(() {});
                     });
                   }
@@ -703,8 +743,13 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
 
                       clearFiledCustom();
                     } else {
-                      validationField(_orderController.text,
-                          'الرجاء ادخل رقم امر الشراء', getSupplier());
+                      presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
+                      validationField(
+                          _orderController.text,
+                          'الرجاء ادخل رقم امر الشراء',
+                          getSupplier()
+                              .whenComplete(() => Navigator.of(context).pop()));
                     }
                   },
                   backgroundColor: customTheme.Primary,

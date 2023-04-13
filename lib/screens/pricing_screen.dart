@@ -10,6 +10,7 @@ import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
 import 'package:samehgroup/extensions/string.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:thermal_printer/thermal_printer.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:http/http.dart' as http;
@@ -37,6 +38,7 @@ class _PricingScreenState extends State<PricingScreen> {
 
   bool _isWriting = false;
 
+  String name = "";
   String address = "";
 
   String itemNo = "";
@@ -136,22 +138,41 @@ class _PricingScreenState extends State<PricingScreen> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
     setState(() {
+      name = preferences.getString(ConfigSharedPreferences.namePrint) ?? "";
       address = preferences.getString(ConfigSharedPreferences.address) ?? "";
     });
   }
 
-  void printTest(
-      String address, String itemName, String price, String barcode) {
-    var arguments = {
-      'PrinterAdd': address,
-      'ItemName': itemName,
-      'Price': price,
-      'Barcode': barcode,
-      'CopyCount': "1",
-    };
-
-    var platform = const MethodChannel('com.samehgroup.samehgroup/khh');
-    platform.invokeListMethod('print', arguments);
+  void presentLoader(BuildContext context,
+      {String text = 'الرجاء الأنتظار لحظات...',
+      bool barrierDismissible = false,
+      bool willPop = true}) {
+    showDialog(
+        barrierDismissible: barrierDismissible,
+        context: context,
+        builder: (c) {
+          return WillPopScope(
+            onWillPop: () async {
+              return willPop;
+            },
+            child: AlertDialog(
+              content: Container(
+                child: Row(
+                  children: <Widget>[
+                    CircularProgressIndicator(),
+                    SizedBox(
+                      width: 20.0,
+                    ),
+                    Text(
+                      text,
+                      style: TextStyle(fontSize: 18.0),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
   }
 
   @override
@@ -219,8 +240,14 @@ class _PricingScreenState extends State<PricingScreen> {
                       setState(() {
                         readOnly = false;
                       });
+
+                      presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
                       validationField(
-                          _barcodeController.text, 'p_e_barcode_no', getItem());
+                          _barcodeController.text,
+                          'p_e_barcode_no',
+                          getItem()
+                              .whenComplete(() => Navigator.of(context).pop()));
                       setState(() {});
                     });
                   }
@@ -237,7 +264,10 @@ class _PricingScreenState extends State<PricingScreen> {
                         scanBarcode(context).whenComplete(() async {
                           if (_barcodeController.text.isNotEmpty) {
                             _pOldItemPriceFocusNode.requestFocus();
-                            await getItem();
+                            presentLoader(context,
+                                text: 'الرجاء الأنتظار لحظات...');
+                            await getItem().whenComplete(
+                                () => Navigator.of(context).pop());
                           }
                         });
                       },
@@ -280,8 +310,13 @@ class _PricingScreenState extends State<PricingScreen> {
                 keyboardType: TextInputType.phone,
                 maxLines: 1,
                 onTap: () async {
+                  presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
                   validationField(
-                      _barcodeController.text, 'p_e_barcode_no', getItem());
+                      _barcodeController.text,
+                      'p_e_barcode_no',
+                      getItem()
+                          .whenComplete(() => Navigator.of(context).pop()));
                 },
                 decoration: InputDecoration(
                     prefixIcon: Icon(Icons.mode_edit_outlined,
@@ -543,15 +578,34 @@ class _PricingScreenState extends State<PricingScreen> {
   void validation() {
     if (_barcodeController.text.isNotEmpty) {
       if (priceOffer.isEmpty) {
-        printTest(address, itemName, price, _barcodeController.text);
+        ZebraBluetoothDevice(address, name).sendZplOverBluetooth("^XA" +
+            "^XA^CI28^CW1,E:TT0003M_.TTF^LL130^FS" +
+            "^MMT" +
+            "^BY3,2,70" +
+            "^FO250,100^BC^FD${_barcodeController.text}^FS" +
+            "^PA0,1,1,1" +
+            "^FPH,1^FT300,50^A@N,50,50,TT0003M_^FH\^CI28^FD${utf8.decode(utf8.encode('$itemName'))}^FS^CI27" +
+            "^XZ");
+        // printTest(address, itemName, price, _barcodeController.text);
       } else {
-        printTest(address, itemName, priceOffer, _barcodeController.text);
+        ZebraBluetoothDevice(address, name).sendZplOverBluetooth("^XA" +
+            "^XA^CI28^CW1,E:TT0003M_.TTF^LL130^FS" +
+            "^MMT" +
+            "^BY3,2,70" +
+            "^FO250,100^BC^FD${_barcodeController.text}^FS" +
+            "^PA0,1,1,1" +
+            "^FPH,1^FT300,50^A@N,50,50,TT0003M_^FH\^CI28^FD${utf8.decode(utf8.encode('$itemName'))}^FS^CI27" +
+            "^XZ");
+        // printTest(address, itemName, priceOffer, _barcodeController.text);
       }
 
       //clear filed
       clearFiled();
     } else {
-      validationField(_barcodeController.text, 'p_e_barcode_no', getItem());
+      presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
+      validationField(_barcodeController.text, 'p_e_barcode_no',
+          getItem().whenComplete(() => Navigator.of(context).pop()));
     }
   }
 

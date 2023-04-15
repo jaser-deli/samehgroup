@@ -78,8 +78,8 @@ class _PrintScreenState extends State<PrintScreen> {
   String printText = "^XA" +
       "^XA^CI28^CW1,E:TT0003M_.TTF^LL130^FS" +
       "^MMT" +
-      "^BY3,2,70" +
-      "^FO250,100^BC^FD12345678^FS" +
+      "^BY2,2,70" +
+      "^FO300,100^BC^FD12345678^FS" +
       "^PA0,1,1,1" +
       "^FPH,1^FT300,50^A@N,50,50,TT0003M_^FH\^CI28^FD${utf8.decode(utf8.encode('تجربة'))}^FS^CI27" +
       "^XZ";

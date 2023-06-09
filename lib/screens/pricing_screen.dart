@@ -579,22 +579,32 @@ class _PricingScreenState extends State<PricingScreen> {
     if (_barcodeController.text.isNotEmpty) {
       if (priceOffer.isEmpty) {
         ZebraBluetoothDevice(address, name).sendZplOverBluetooth("^XA" +
-            "^XA^CI28^CW1,E:TT0003M_.TTF^LL130^FS" +
+            "^CWZ,E:TT0003M_.FNT^FS" +
             "^MMT" +
-            "^BY3,2,70" +
-            "^FO250,100^BC^FD${_barcodeController.text}^FS" +
-            "^PA0,1,1,1" +
-            "^FPH,1^FT300,50^A@N,50,50,TT0003M_^FH\^CI28^FD${utf8.decode(utf8.encode('$itemName'))}^FS^CI27" +
+            "^BY2,2,85" +
+            "^FO180,170^BC^FD${_barcodeController.text}^FS" +
+            "^PA1,1,1,1^FS" +
+            "^FO420,50^CI28^AZN,35,35^TBN,250,250^FD${utf8.decode(utf8.encode('$itemName'))}^FS" +
+            "^PA1,1,1,1^FS" +
+            "^FO550,70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode('$price'))}^FS" +
+            "^PA1,1,1,1^FS" +
+            "^FO650,170^CI28^AZN,35,35^TBN,180,250^FD${utf8.decode(utf8.encode('$normal'))}^FS" +
+            "^PQ1" +
             "^XZ");
         // printTest(address, itemName, price, _barcodeController.text);
       } else {
         ZebraBluetoothDevice(address, name).sendZplOverBluetooth("^XA" +
-            "^XA^CI28^CW1,E:TT0003M_.TTF^LL130^FS" +
+            "^CWZ,E:TT0003M_.FNT^FS" +
             "^MMT" +
-            "^BY3,2,70" +
-            "^FO250,100^BC^FD${_barcodeController.text}^FS" +
-            "^PA0,1,1,1" +
-            "^FPH,1^FT300,50^A@N,50,50,TT0003M_^FH\^CI28^FD${utf8.decode(utf8.encode('$itemName'))}^FS^CI27" +
+            "^BY2,2,85" +
+            "^FO180,170^BC^FD${_barcodeController.text}^FS" +
+            "^PA1,1,1,1^FS" +
+            "^FO420,50^CI28^AZN,35,35^TBN,250,250^FD${utf8.decode(utf8.encode('$itemName'))}^FS" +
+            "^PA1,1,1,1^FS" +
+            "^FO550,70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode('$priceOffer'))}^FS" +
+            "^PA1,1,1,1^FS" +
+            "^FO650,170^CI28^AZN,35,35^TBN,180,250^FD${utf8.decode(utf8.encode('$normal'))}^FS" +
+            "^PQ1" +
             "^XZ");
         // printTest(address, itemName, priceOffer, _barcodeController.text);
       }

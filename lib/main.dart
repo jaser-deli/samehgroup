@@ -115,7 +115,9 @@ Future<void> main() async {
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  await isUpdate();
+  // await isUpdate();
+
+  loadView = await isLogin();
 
   runApp(ChangeNotifierProvider<AppNotifier>(
     create: (context) => AppNotifier(),

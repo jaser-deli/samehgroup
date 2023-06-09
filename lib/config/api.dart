@@ -1,13 +1,10 @@
 class Api {
-  static String baseUrl =
-      "http://188.247.88.114:8084/samehgroup/public/api/v1/";
+  static String baseUrl = "http://ls.samehgroup.com/api/v1/";
+static String urlAppPrint = "http://ls.samehgroup.com/storage/apps/KHH_BarcodePrint.apk";
 
-  static String baseUrlMain =
-      "http://ls.samehgroup.com:8081/LiveSales_old_new/public/api/v1/";
-
-  static String app = "${baseUrlMain}apps";
-  static String notifications = "${baseUrlMain}notifications";
-  static String notificationUpdate = "${baseUrlMain}notifications/update";
+  static String app = "${baseUrl}apps";
+  static String notifications = "${baseUrl}notifications";
+  static String notificationUpdate = "${baseUrl}notifications/update";
 
   static String login = "${baseUrl}login";
   static String tokenUpdate = "${baseUrl}token_update";
@@ -56,4 +53,6 @@ class Api {
   static String ricivingSupplier = "${baseUrl}riciving";
   static String ricivingBarcode = "${baseUrl}riciving/barcode";
   static String ricivingSave = "${baseUrl}riciving/save";
+
+  static String uploadImages = "${baseUrl}upload/images";
 }

@@ -35,6 +35,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   // Focus Nodes
   late FocusNode _barcodeFocusNode;
+  late FocusNode _quantityInventoryFocusNode;
 
   // read only Field
   bool readOnly = true;
@@ -54,9 +55,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
     _quantityInventoriedController = TextEditingController();
 
     _barcodeFocusNode = FocusNode();
+    _quantityInventoryFocusNode = FocusNode();
 
     customTheme = AppTheme.customTheme;
     theme = AppTheme.theme;
+
+    _barcodeFocusNode.requestFocus();
   }
 
   Future<void> getItem() async {
@@ -90,6 +94,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
             message: 'p_c_t_b_n_e'.tr(),
           ),
         );
+
+        _barcodeFocusNode.requestFocus();
       }
     }
   }
@@ -230,6 +236,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
               FxTextField(
                 controller: _barcodeController,
                 cursorColor: customTheme.Primary,
+                focusNode: _barcodeFocusNode,
                 readOnly: false,
                 style: TextStyle(color: customTheme.Primary),
                 keyboardType: TextInputType.phone,
@@ -371,52 +378,87 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           ]),
                     ),
               FxSpacing.height(24),
-              FxTextField(
-                controller: _quantityInventoryController,
-                cursorColor: customTheme.Primary,
-                readOnly: readOnly,
-                style: TextStyle(color: customTheme.Primary),
-                keyboardType: TextInputType.phone,
-                maxLines: 1,
-                onTap: () {
-                  presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: FxTextField(
+                      controller: _quantityInventoryController,
+                      focusNode: _quantityInventoryFocusNode,
+                      cursorColor: customTheme.Primary,
+                      readOnly: readOnly,
+                      style: TextStyle(color: customTheme.Primary),
+                      keyboardType: TextInputType.phone,
+                      maxLines: 1,
+                      onTap: () {
+                        presentLoader(context,
+                            text: 'الرجاء الأنتظار لحظات...');
 
-                  validationField(
-                      _barcodeController.text,
-                      'p_e_barcode_no',
-                      getItem()
-                          .whenComplete(() => Navigator.of(context).pop()));
-                },
-                decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.production_quantity_limits,
-                        color: customTheme.Primary),
-                    prefixIconColor: customTheme.Primary,
-                    hintText: 'inventory_quantity'.tr(),
-                    hintStyle: TextStyle(color: customTheme.Primary),
-                    fillColor: customTheme.Primary.withAlpha(40),
-                    filled: true,
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    counter: const Offstage(),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: customTheme.Primary,
-                          width: 1.0,
-                        ),
-                        borderRadius: BorderRadius.circular(8.0)),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                          color: Colors.transparent,
-                          width: 1.0,
-                        ),
-                        borderRadius: BorderRadius.circular(8.0)),
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: customTheme.Primary,
-                          width: 1.0,
-                        ),
-                        borderRadius: BorderRadius.circular(8.0))),
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+                        validationField(
+                            _barcodeController.text,
+                            'p_e_barcode_no',
+                            getItem().whenComplete(
+                                () => Navigator.of(context).pop()));
+                      },
+                      decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.production_quantity_limits,
+                              color: customTheme.Primary),
+                          prefixIconColor: customTheme.Primary,
+                          hintText: 'inventory_quantity'.tr(),
+                          hintStyle: TextStyle(color: customTheme.Primary),
+                          fillColor: customTheme.Primary.withAlpha(40),
+                          filled: true,
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                          counter: const Offstage(),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: customTheme.Primary,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0)),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Colors.transparent,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0)),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: customTheme.Primary,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0))),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d+\.?\d*')),
+                      ],
+                    ),
+                  ),
+                  Expanded(child: FxSpacing.height(24)),
+                  Expanded(
+                    flex: 1,
+                    child: FxButton.medium(
+                        borderRadiusAll: 8,
+                        onPressed: () {
+                          save(
+                              invHead,
+                              invDtlId,
+                              _quantityInventoryController.text,
+                              _barcodeController.text,
+                              context);
+
+                          clearFiled();
+
+                          _quantityInventoryFocusNode.requestFocus();
+                        },
+                        backgroundColor: customTheme.Primary,
+                        child: FxText.labelLarge(
+                          "save".tr(),
+                          color: customTheme.OnPrimary,
+                        )),
+                  ),
                 ],
               ),
               FxSpacing.height(24),
@@ -461,45 +503,21 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 ],
               ),
               FxSpacing.height(16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  FxButton.medium(
-                      borderRadiusAll: 8,
-                      onPressed: () {
-                        save(
-                            invHead,
-                            invDtlId,
-                            _quantityInventoryController.text,
-                            _barcodeController.text,
-                            context);
+              FxButton.medium(
+                  borderRadiusAll: 8,
+                  onPressed: () async {
+                    clear(invHead, invDtlId, _quantityInventoryController.text);
 
-                        clearFiled();
-                      },
-                      backgroundColor: customTheme.Primary,
-                      child: FxText.labelLarge(
-                        "save".tr(),
-                        color: customTheme.OnPrimary,
-                      )),
-                  FxButton.medium(
-                      borderRadiusAll: 8,
-                      onPressed: () async {
-                        clear(invHead, invDtlId,
-                            _quantityInventoryController.text);
+                    presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
 
-                        presentLoader(context,
-                            text: 'الرجاء الأنتظار لحظات...');
-
-                        await getItem()
-                            .whenComplete(() => Navigator.of(context).pop());
-                      },
-                      backgroundColor: customTheme.Primary,
-                      child: FxText.labelLarge(
-                        "clear".tr(),
-                        color: customTheme.OnPrimary,
-                      )),
-                ],
-              ),
+                    await getItem()
+                        .whenComplete(() => Navigator.of(context).pop());
+                  },
+                  backgroundColor: customTheme.Primary,
+                  child: FxText.labelLarge(
+                    "clear".tr(),
+                    color: customTheme.OnPrimary,
+                  )),
             ],
           ),
         );

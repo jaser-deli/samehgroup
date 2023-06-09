@@ -258,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     FxSpacing.width(12),
                     InkWell(
                       onTap: () {
-                        launch("tel://+962786322012").catchError((error) {
+                        launch("tel://+96278350173").catchError((error) {
                           AwesomeDialog(
                                   context: context,
                                   dialogType: DialogType.info,

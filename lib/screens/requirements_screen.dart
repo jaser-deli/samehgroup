@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:app_installer/app_installer.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
-import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +17,6 @@ import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutx/flutx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class Requirements extends StatefulWidget {
   const Requirements({Key? key}) : super(key: key);
@@ -33,9 +32,6 @@ class _RequirementsState extends State<Requirements> {
   bool barcodePrint = false;
   bool isEnableBarcodePrint = false;
 
-  String url =
-      "http://ls.samehgroup.com:8081/LiveSales_old_new/public/storage/apps/KHH_BarcodePrint.apk";
-
   @override
   void initState() {
     super.initState();
@@ -44,7 +40,6 @@ class _RequirementsState extends State<Requirements> {
 
     loadRequirements();
 
-    // openAPK();
     initFlutterDownloader();
   }
 
@@ -61,13 +56,8 @@ class _RequirementsState extends State<Requirements> {
     });
   }
 
-  // Future<void> openAPK() async {
-  //   OpenFile.open("/storage/emulated/0/Android/data/com.samehgroup.samehgroup/files/KHH_BarcodePrint.apk");
-  // }
 
   Future<void> initFlutterDownloader() async {
-    // await OpenFilex.open(
-    //     "${(await getExternalStorageDirectory())!.path}/KHH_BarcodePrint.apk");
 
     await Permission.storage.request();
 
@@ -113,9 +103,11 @@ class _RequirementsState extends State<Requirements> {
                         children: [
                           InkWell(
                             onTap: () async {
-                              print("onDownloadStart $url");
-                              final taskId = await FlutterDownloader.enqueue(
-                                url: url.toString(),
+                              print(
+                                  "onDownloadStart ${Api.urlAppPrint.toString()}");
+
+                              await FlutterDownloader.enqueue(
+                                url: Api.urlAppPrint.toString(),
                                 savedDir:
                                     (await getExternalStorageDirectory())!.path,
                                 showNotification: true,
@@ -124,10 +116,10 @@ class _RequirementsState extends State<Requirements> {
                                     true, // click on notification to open downloaded file (for Android)
                               );
 
-                              // if (taskId != null) {
-                              //   await OpenFilex.open(
-                              //       "${(await getExternalStorageDirectory())!.path}/KHH_BarcodePrint.apk");
-                              // }
+                              Future.delayed(Duration(seconds: 5), () async {
+                                await AppInstaller.installApk(
+                                    "${(await getExternalStorageDirectory())!.path}/KHH_BarcodePrint.apk");
+                              });
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(
@@ -155,7 +147,7 @@ class _RequirementsState extends State<Requirements> {
                                               Expanded(
                                                   flex: 1,
                                                   child: FxText.titleSmall(
-                                                      "Barcode Print",
+                                                      "App Print",
                                                       fontWeight: 500)),
                                               FxText.titleSmall(
                                                   isEnableBarcodePrint

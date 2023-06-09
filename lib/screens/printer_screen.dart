@@ -4,7 +4,6 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:battery_indicator/battery_indicator.dart';
 import 'package:bluetooth_connector/bluetooth_connector.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:thermal_printer/thermal_printer.dart';
 import 'package:provider/provider.dart';
@@ -75,14 +74,22 @@ class _PrintScreenState extends State<PrintScreen> {
     }
   }
 
-  String printText = "^XA" +
-      "^XA^CI28^CW1,E:TT0003M_.TTF^LL130^FS" +
-      "^MMT" +
-      "^BY2,2,70" +
-      "^FO300,100^BC^FD12345678^FS" +
-      "^PA0,1,1,1" +
-      "^FPH,1^FT300,50^A@N,50,50,TT0003M_^FH\^CI28^FD${utf8.decode(utf8.encode('تجربة'))}^FS^CI27" +
-      "^XZ";
+  String printText =
+
+      // "^XA^LRN^CI28^CWZ,E:TT0003M_.FNT^FS" +
+      "^XA" +
+          "^CWZ,E:TT0003M_.FNT^FS" +
+          "^MMT" +
+          "^BY2,2,85" +
+          "^FO180,170^BC^FD12345678^FS" +
+          "^PA0,1,1,1" +
+          "^FO420,50^CI28^AZN,35,35^TBN,250,250^FD${utf8.decode(utf8.encode('بهارات مشكلة تجربة تجربة'))}^FS" +
+          "^PA0,1,1,1" +
+          "^FO550,70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode('9.99'))}^FS" +
+          "^PA0,1,1,1" +
+          "^FO650,170^TBN,180,250^A@N,35,35,TT0003M_^FH\^CI28^FD${utf8.decode(utf8.encode('تاريخ اليوم   ١٧ أبريل ٢٠٢٣ م'))}^FS^CI27" +
+          "^PQ1" +
+          "^XZ";
 
   String zpl = '! U1 setvar "device.languages" "zpl"' +
       '! U1 setvar "device.pnp_option" "zpl"' +

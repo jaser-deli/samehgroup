@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:samehgroup/config/api.dart';
 
 class HttpUploadService {
   Future<String> uploadPhotos(List<String> paths, String number) async {
-    Uri uri = Uri.parse(
-        'http://ls.samehgroup.com:8081/LiveSales_old_new/public/api/v1/upload/images');
+    Uri uri = Uri.parse(Api.uploadImages);
     http.MultipartRequest request = http.MultipartRequest('POST', uri);
     for (String path in paths) {
       request.files.add(await http.MultipartFile.fromPath('files[]', path));

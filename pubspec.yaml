@@ -81,6 +81,7 @@ dependencies:
   open_file: ^3.2.1
   flutter_blue: ^0.8.0
   battery_indicator: ^0.1.2
+  app_installer: ^1.1.0
 
 dependency_overrides:
   intl: ^0.17.0

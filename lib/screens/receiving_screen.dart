@@ -41,8 +41,9 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
 
   bool readOnlyBarcode = true;
   bool readOnly = true;
+  bool statusBrcode = false;
 
-  bool _isWriting = false;
+  // bool _isWriting = false;
 
   String supplierName = "";
   String supplierNo = "";
@@ -79,16 +80,18 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
 
       print(responseBody["data"]);
       if (responseBody["data"] != null) {
-        itemNo = responseBody["data"]["item_no"];
-        itemName = responseBody["data"]["item_name"];
-        itemEquivelentQty = responseBody["data"]["itm_equivelent_qty"];
+        setState(() {
+          itemNo = responseBody["data"]["item_no"];
+          itemName = responseBody["data"]["item_name"];
+          itemEquivelentQty = responseBody["data"]["itm_equivelent_qty"];
+          statusBrcode = true;
+        });
       } else {
         setState(() {
           readOnly = true;
+          statusBrcode = false;
         });
 
-        // clearFiled();
-        //
         // showTopSnackBar(
         //   Overlay.of(context),
         //   CustomSnackBar.error(
@@ -96,6 +99,9 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
         //     // رقم الباركود غير مشمول في طلب الشراء
         //   ),
         // );
+
+        // clearFiled();
+        //
       }
     }
   }
@@ -351,26 +357,27 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                       getSupplier()
                           .whenComplete(() => Navigator.of(context).pop()));
                 },
-                onChanged: (text) {
-                  if (!_isWriting) {
-                    _isWriting = true;
-                    setState(() {});
-                    Future.delayed(Duration(seconds: 2)).whenComplete(() async {
-                      _isWriting = false;
-                      if (_barcodeController.text.isNotEmpty) {
-                        setState(() {
-                          readOnly = false;
-                        });
-                      }
-
-                      presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
-
-                      await getItem()
-                          .whenComplete(() => Navigator.of(context).pop());
-                      setState(() {});
-                    });
-                  }
-                },
+                // onChanged: (text) {
+                //   if (!_isWriting) {
+                //     _isWriting = true;
+                //     setState(() {});
+                //     Future.delayed(Duration(seconds: 10))
+                //         .whenComplete(() async {
+                //       _isWriting = false;
+                //       if (_barcodeController.text.isNotEmpty) {
+                //         setState(() {
+                //           readOnly = false;
+                //         });
+                //       }
+                //
+                //       presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+                //
+                //       await getItem()
+                //           .whenComplete(() => Navigator.of(context).pop());
+                //       setState(() {});
+                //     });
+                //   }
+                // },
                 decoration: InputDecoration(
                     prefixIcon: IconButton(
                       icon: const Icon(Icons.qr_code),
@@ -515,7 +522,31 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                       style: TextStyle(color: customTheme.Primary),
                       keyboardType: TextInputType.phone,
                       maxLines: 1,
-                      onTap: () async {},
+                      onTap: () async {
+                        if (_barcodeController.text.isNotEmpty) {
+                          setState(() {
+                            readOnly = false;
+                          });
+                        }
+
+                        presentLoader(context,
+                            text: 'الرجاء الأنتظار لحظات...');
+
+                        await getItem()
+                            .whenComplete(() => Navigator.of(context).pop());
+                        setState(() {});
+
+                        if (statusBrcode == false) {
+                          _barcodeController.clear();
+                          showTopSnackBar(
+                            Overlay.of(context),
+                            CustomSnackBar.error(
+                              message:
+                                  'رقم الباركود غير مشمول في طلب الشراء'.tr(),
+                            ),
+                          );
+                        }
+                      },
                       decoration: InputDecoration(
                           prefixIcon: Icon(Icons.production_quantity_limits,
                               color: customTheme.Primary),
@@ -727,22 +758,7 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
               FxButton.medium(
                   borderRadiusAll: 8,
                   onPressed: () {
-                    if (_barcodeController.text.isNotEmpty) {
-                      save(
-                          _orderController.text,
-                          periodNo,
-                          branchNo,
-                          supplierNo,
-                          itemNo,
-                          _barcodeController.text,
-                          itemEquivelentQty,
-                          _itemQtyController.text,
-                          _itemPriceController.text,
-                          _dateController.text,
-                          _invQtyController.text);
-
-                      clearFiledCustom();
-                    } else {
+                    if (_orderController.text.isEmpty) {
                       presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
 
                       validationField(
@@ -750,7 +766,54 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
                           'الرجاء ادخل رقم امر الشراء',
                           getSupplier()
                               .whenComplete(() => Navigator.of(context).pop()));
+                      return;
                     }
+
+                    if (_barcodeController.text.isEmpty) {
+                      presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
+                      validationField(
+                          _barcodeController.text,
+                          'p_e_barcode_no',
+                          getItem()
+                              .whenComplete(() => Navigator.of(context).pop()));
+                      return;
+                    }
+
+                    if (_itemQtyController.text.isEmpty) {
+                      showTopSnackBar(
+                        Overlay.of(context),
+                        CustomSnackBar.error(
+                          message: 'الرجاء ادخل الكمية'.tr(),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // if (_dateController.text.isEmpty) {
+                    //   showTopSnackBar(
+                    //     Overlay.of(context),
+                    //     CustomSnackBar.error(
+                    //       message: 'الرجاء ادخل التاريخ'.tr(),
+                    //     ),
+                    //   );
+                    //   return;
+                    // }
+
+                    save(
+                        _orderController.text,
+                        periodNo,
+                        branchNo,
+                        supplierNo,
+                        itemNo,
+                        _barcodeController.text,
+                        itemEquivelentQty,
+                        _itemQtyController.text,
+                        _itemPriceController.text,
+                        _dateController.text,
+                        _invQtyController.text);
+
+                    clearFiledCustom();
                   },
                   backgroundColor: customTheme.Primary,
                   child: FxText.labelLarge(

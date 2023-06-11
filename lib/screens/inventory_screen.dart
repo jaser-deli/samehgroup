@@ -245,6 +245,18 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   //clear filed
                   clearFiled();
                 },
+                onEditingComplete: () {
+                  presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+
+                  validationField(
+                      _barcodeController.text,
+                      'p_e_barcode_no',
+                      getItem()
+                          .whenComplete(() => Navigator.of(context).pop()));
+
+                  FocusScope.of(context)
+                      .requestFocus(_quantityInventoryFocusNode);
+                },
                 decoration: InputDecoration(
                     prefixIcon: IconButton(
                       icon: const Icon(Icons.qr_code),
@@ -450,8 +462,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               context);
 
                           clearFiled();
-
-                          _quantityInventoryFocusNode.requestFocus();
                         },
                         backgroundColor: customTheme.Primary,
                         child: FxText.labelLarge(
@@ -512,6 +522,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
                     await getItem()
                         .whenComplete(() => Navigator.of(context).pop());
+
+                    _quantityInventoryFocusNode.requestFocus();
                   },
                   backgroundColor: customTheme.Primary,
                   child: FxText.labelLarge(

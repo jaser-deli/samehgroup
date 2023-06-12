@@ -462,6 +462,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               context);
 
                           clearFiled();
+
+                          _barcodeFocusNode.requestFocus();
                         },
                         backgroundColor: customTheme.Primary,
                         child: FxText.labelLarge(

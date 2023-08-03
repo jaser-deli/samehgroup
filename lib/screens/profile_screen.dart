@@ -57,12 +57,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         jsonDecode(preferences.getString(ConfigSharedPreferences.userInfo)!)
             as Map<String, dynamic>;
 
-    version = preferences.getString(ConfigSharedPreferences.version)!;
+    // version = preferences.getString(ConfigSharedPreferences.version)!;
 
     setState(() {
       username = userInfo["user_name"];
       branchNo = userInfo["branch_no"];
     });
+
   }
 
   void logout() async {

@@ -5,6 +5,7 @@ import 'package:flutter_holo_date_picker/flutter_holo_date_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:samehgroup/config/api.dart';
+import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/extensions/string.dart';
 import 'package:samehgroup/screens/barcode_scanner_screen.dart';
 import 'package:samehgroup/screens/camera_screen.dart';
@@ -12,6 +13,7 @@ import 'package:samehgroup/theme/app_notifier.dart';
 import 'package:samehgroup/theme/app_theme.dart';
 import 'package:flutx/flutx.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -118,8 +120,14 @@ class _ReceivingScreenState extends State<ReceivingScreen> {
   }
 
   Future getSupplier() async {
-    var response = await http
-        .get(Uri.parse("${Api.ricivingSupplier}/${_orderController.text}"));
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    Map<String, dynamic> userInfo =
+        jsonDecode(preferences.getString(ConfigSharedPreferences.userInfo)!)
+            as Map<String, dynamic>;
+
+    var response = await http.get(Uri.parse(
+        "${Api.ricivingSupplier}/${_orderController.text}/${userInfo["branch_no"]}"));
     if (response.statusCode == 200) {
       var responseBody = json.decode(response.body);
 

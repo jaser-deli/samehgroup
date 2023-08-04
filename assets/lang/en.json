@@ -66,5 +66,7 @@
   "q_c_s": "Quantity cleared successfully",
   "o_a_s": "Operation accomplished successfully",
   "a_e_o": "An error occurred, try again",
+  "online": "Online",
+  "offline": "Offline",
   "logout": "LOGOUT"
 }

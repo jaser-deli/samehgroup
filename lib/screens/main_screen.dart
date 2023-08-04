@@ -103,6 +103,20 @@ class _MainScreenState extends State<MainScreen> {
                   .copyWith(secondary: customTheme.Primary.withAlpha(40))),
           child: Scaffold(
             backgroundColor: FxAppTheme.theme.scaffoldBackgroundColor,
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(50), // Set this height
+              child: Container(
+                color: true ? Colors.green : Colors.red,
+                child: SafeArea(
+                  child: Center(
+                    child: Text(
+                      true ? 'online'.tr() : 'offline'.tr(),
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                  ),
+                ),
+              ),
+            ),
             body: SizedBox.expand(
               child: PageView(
                 controller: _pageController,

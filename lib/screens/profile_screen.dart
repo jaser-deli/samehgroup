@@ -274,6 +274,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Divider(
                       thickness: 0.8,
                     ),
+                    SwitchListTile(
+                      dense: true,
+                      contentPadding: FxSpacing.zero,
+                      inactiveTrackColor: theme.colorScheme.primary.withAlpha(100),
+                      activeTrackColor: theme.colorScheme.primary.withAlpha(150),
+                      activeColor: theme.colorScheme.primary,
+                      title: FxText.bodyMedium(
+                        "وضع الاتصال",
+                        letterSpacing: 0,
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          // notification = value;
+                        });
+                      },
+                      value: true,
+                    ),
+                    const Divider(
+                      thickness: 0.8,
+                    ),
                     FxSpacing.height(16),
                     Center(
                         child: FxButton.rounded(

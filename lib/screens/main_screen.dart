@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:awesome_bottom_bar/awesome_bottom_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -26,6 +27,9 @@ class _MainScreenState extends State<MainScreen> {
   late CustomTheme customTheme;
   late ThemeData theme;
 
+  ConnectivityResult _connectivityResult = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+
   late PageController _pageController;
 
   int currentIndex = 0;
@@ -40,8 +44,30 @@ class _MainScreenState extends State<MainScreen> {
 
     _pageController = PageController();
 
+    initConnectivity();
+
+    _connectivity.onConnectivityChanged.listen((result) {
+      setState(() {
+        _connectivityResult = result;
+      });
+    });
+
     init();
     notifications();
+  }
+
+  Future<void> initConnectivity() async {
+    ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+    } catch (e) {
+      print(e.toString());
+      result = ConnectivityResult.none;
+    }
+
+    setState(() {
+      _connectivityResult = result;
+    });
   }
 
   Future<void> init() async {
@@ -106,11 +132,15 @@ class _MainScreenState extends State<MainScreen> {
             appBar: PreferredSize(
               preferredSize: Size.fromHeight(50), // Set this height
               child: Container(
-                color: true ? Colors.green : Colors.red,
+                color: _connectivityResult == ConnectivityResult.none
+                    ? Colors.red
+                    : Colors.green,
                 child: SafeArea(
                   child: Center(
                     child: Text(
-                      true ? 'online'.tr() : 'offline'.tr(),
+                      _connectivityResult == ConnectivityResult.none
+                          ? 'offline'.tr()
+                          : 'online'.tr(),
                       style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   ),

@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -10,7 +12,6 @@ import 'package:restart_app/restart_app.dart';
 import 'package:samehgroup/config/api.dart';
 import 'package:samehgroup/config/config_shared_preferences.dart';
 import 'package:samehgroup/config/images.dart';
-import 'package:samehgroup/config/screens.dart';
 import 'package:samehgroup/extensions/string.dart';
 import 'package:samehgroup/extensions/widgets_extension.dart';
 import 'package:samehgroup/screens/printer_screen.dart';
@@ -36,6 +37,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late CustomTheme customTheme;
   late ThemeData theme;
 
+  ConnectivityResult _connectivityResult = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+
   bool isDark = false;
 
   String version = "";
@@ -47,7 +51,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     customTheme = AppTheme.customTheme;
     theme = AppTheme.theme;
+
+    initConnectivity();
+
+    _connectivity.onConnectivityChanged.listen((result) {
+      setState(() {
+        _connectivityResult = result;
+      });
+    });
+
     loadProfile();
+  }
+
+  Future<void> initConnectivity() async {
+    ConnectivityResult result;
+    try {
+      result = await _connectivity.checkConnectivity();
+    } catch (e) {
+      print(e.toString());
+      result = ConnectivityResult.none;
+    }
+
+    setState(() {
+      _connectivityResult = result;
+    });
   }
 
   Future loadProfile() async {
@@ -274,22 +301,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Divider(
                       thickness: 0.8,
                     ),
-                    SwitchListTile(
-                      dense: true,
-                      contentPadding: FxSpacing.zero,
-                      inactiveTrackColor: theme.colorScheme.primary.withAlpha(100),
-                      activeTrackColor: theme.colorScheme.primary.withAlpha(150),
-                      activeColor: theme.colorScheme.primary,
-                      title: FxText.bodyMedium(
-                        "وضع الاتصال",
-                        letterSpacing: 0,
+                    InkWell(
+                      onTap: _connectivityResult == ConnectivityResult.none
+                          ? () {}
+                          : () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (_) => PrintScreen()),
+                              );
+                            },
+                      highlightColor: Colors.transparent,
+                      splashColor: Colors.transparent,
+                      child: Row(
+                        children: [
+                          FxContainer(
+                            paddingAll: 12,
+                            borderRadiusAll: 4,
+                            color: CustomTheme.peach.withAlpha(20),
+                            child: Image(
+                              height: 20,
+                              width: 20,
+                              image: AssetImage(Images.signalOutline),
+                              color: CustomTheme.peach,
+                            ),
+                          ),
+                          FxSpacing.width(16),
+                          Expanded(
+                            child: FxText.bodyMedium(
+                              'ترحيل البينات الى الشبكة ${_connectivityResult == ConnectivityResult.none ? '(غير مفعل)' : '(مفعل)'}'
+                                  .tr(),
+                            ),
+                          ),
+                          FxSpacing.width(16),
+                          Icon(
+                            FeatherIcons.chevronRight,
+                            size: 18,
+                            color: theme.colorScheme.onBackground,
+                          ).autoDirection(),
+                        ],
                       ),
-                      onChanged: (value) {
-                        setState(() {
-                          // notification = value;
-                        });
-                      },
-                      value: true,
                     ),
                     const Divider(
                       thickness: 0.8,

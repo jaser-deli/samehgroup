@@ -76,12 +76,13 @@ dependencies:
   flutter_phoenix: ^1.1.0
   bluetooth_connector: ^0.0.3
   flutter_downloader: ^1.10.2
-  permission_handler: ^10.2.0
+  permission_handler: ^10.4.3
   path_provider: ^2.0.13
   open_file: ^3.2.1
   flutter_blue: ^0.8.0
   battery_indicator: ^0.1.2
   app_installer: ^1.1.0
+  connectivity_plus: ^4.0.2
 
 dependency_overrides:
   intl: ^0.17.0

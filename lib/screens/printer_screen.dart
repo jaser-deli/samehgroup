@@ -74,22 +74,19 @@ class _PrintScreenState extends State<PrintScreen> {
     }
   }
 
-  String printText =
-
-      // "^XA^LRN^CI28^CWZ,E:TT0003M_.FNT^FS" +
-      "^XA" +
-          "^CWZ,E:TT0003M_.FNT^FS" +
-          "^MMT" +
-          "^BY2,2,85" +
-          "^FO180,170^BC^FD12345678^FS" +
-          "^PA0,1,1,1" +
-          "^FO420,50^CI28^AZN,35,35^TBN,250,250^FD${utf8.decode(utf8.encode('بهارات مشكلة تجربة تجربة'))}^FS" +
-          "^PA0,1,1,1" +
-          "^FO550,70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode('9.99'))}^FS" +
-          "^PA0,1,1,1" +
-          "^FO650,170^TBN,180,250^A@N,35,35,TT0003M_^FH\^CI28^FD${utf8.decode(utf8.encode('تاريخ اليوم   ١٧ أبريل ٢٠٢٣ م'))}^FS^CI27" +
-          "^PQ1" +
-          "^XZ";
+  String printText = "^XA" +
+      "^CWZ,E:TT0003M_.FNT^FS" +
+      "^MMT" +
+      "^BY2,1,75" +
+      "^FO150,160^BC^FD1234567890^FS" +
+      "^PA1,1,1,1^FS" +
+      "^FO420,30^CI28^AZN,35,35^TBN,250,250^FD${utf8.decode(utf8.encode('بهارت مشكلة'))}^FS" +
+      "^PA1,1,1,1^FS" +
+      "^FO550,70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode('9.99'))}^FS" +
+      "^PA1,1,1,1^FS" +
+      "^FO660,170^CI28^AZN,25,25^TBN,180,230^FD${utf8.decode(utf8.encode('من 2023-04-01 الى 2023-04-15'))}^FS" +
+      "^PQ1" +
+      "^XZ";
 
   String zpl = '! U1 setvar "device.languages" "zpl"' +
       '! U1 setvar "device.pnp_option" "zpl"' +

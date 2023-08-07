@@ -305,10 +305,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onTap: _connectivityResult == ConnectivityResult.none
                           ? () {}
                           : () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (_) => PrintScreen()),
-                              );
+                              // Navigator.of(context).push(
+                              //   MaterialPageRoute(
+                              //       builder: (_) => PrintScreen()),
+                              // );
                             },
                       highlightColor: Colors.transparent,
                       splashColor: Colors.transparent,

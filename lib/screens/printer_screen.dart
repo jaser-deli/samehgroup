@@ -74,22 +74,58 @@ class _PrintScreenState extends State<PrintScreen> {
     }
   }
 
-  String printText = "^XA" +
-      "^CWZ,E:TT0003M_.FNT^FS" +
-      "^MMT" +
-      "^BY2,1,75" +
-      "^FO150,160^BC^FD1234567890^FS" +
-      "^PA1,1,1,1^FS" +
-      "^FO420,30^CI28^AZN,35,35^TBN,250,250^FD${utf8.decode(utf8.encode('بهارت مشكلة'))}^FS" +
-      "^PA1,1,1,1^FS" +
-      "^FO550,70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode('9.99'))}^FS" +
-      "^PA1,1,1,1^FS" +
-      "^FO660,170^CI28^AZN,25,25^TBN,180,230^FD${utf8.decode(utf8.encode('من 2023-04-01 الى 2023-04-15'))}^FS" +
-      "^PQ1" +
-      "^XZ";
+  String generateCPCLCode(String price) {
+    return """
+    ^XA
+    ^CWZ,E:TT0003M_.FNT^FS
+    ^PW1300
+    ^LL700
+    ^BY2,1,75
+    ^FO150,160^BCN,100,Y,N,N^FD123456789012^FS
+    ^PA1,1,1,1^FS
+    ^FO420,50^CI28^AZN,35,35^TBN,250,250^FD${utf8.decode(utf8.encode('بهارت مشكلة'))}^FS
+    ^PA1,1,1,1^FS
+    ${getPriceFieldCode(price)}
+    ^PA1,1,1,1^FS
+    ^FO660,170^CI28^AZN,25,25^TBN,180,230^FD${utf8.decode(utf8.encode('من 2023-04-01 الى 2023-04-15'))}^FS
+    ^PQ1
+    ^XZ
+  """;
+  }
 
-  String zpl = '! U1 setvar "device.languages" "zpl"' +
-      '! U1 setvar "device.pnp_option" "zpl"' +
+  String getPriceFieldCode(String price) {
+    double priceValue = double.tryParse(price) ?? 0.0;
+
+    if (priceValue >= 1.0) {
+      List<String> priceParts = priceValue.toStringAsFixed(2).split('.');
+      String beforeComma = priceParts[0];
+      String afterComma = priceParts[1];
+
+      double beforeCommaWidth =
+          (beforeComma.length * 25).toDouble(); // Adjust the width as needed
+      double afterCommaWidth =
+          (afterComma.length * 25).toDouble(); // Adjust the width as needed
+
+      int totalWidth = (beforeCommaWidth + afterCommaWidth + 5)
+          .toInt(); // Adjust the spacing as needed
+
+      return """
+      ^FO${575 - totalWidth ~/ 2},70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode(beforeComma))}^FS
+      ^FO${575 + totalWidth ~/ 2 - afterCommaWidth.toInt()},80^CI28^AZN,35,35^TBN,180,250^FD${utf8.decode(utf8.encode('.$afterComma'))}^FS
+    """;
+    } else {
+      return "^FO550,70^CI28^AZN,35,35^TBN,180,250^FD${utf8.decode(utf8.encode(price))}^FS";
+    }
+  }
+
+  // String zpl = '! U1 setvar "media.type" "label"'
+  //         '! U1 setvar "device.languages" "zpl"' +
+  //     '! U1 setvar "device.pnp_option" "zpl"' +
+  //     '! U1 do "device.reset" "" <CR>';
+
+  String zpl =
+      '! U1 setvar "media.type" "gap"' +
+      '! U1 do "device.save"' +
       '! U1 do "device.reset" "" <CR>';
 
   Future<void> deviceList() async {
@@ -397,7 +433,8 @@ class _PrintScreenState extends State<PrintScreen> {
                     borderRadiusAll: 8,
                     // onPressed: printTest, //printTest,
                     onPressed: () => ZebraBluetoothDevice(address, name)
-                        .sendZplOverBluetooth(printText), //printTest,
+                        .sendZplOverBluetooth(generateCPCLCode("1.50")),
+                    //printTest,
                     backgroundColor: customTheme.Primary,
                     child: FxText.labelLarge(
                       'Print Test'.tr(),

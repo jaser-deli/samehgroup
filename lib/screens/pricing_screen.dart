@@ -14,6 +14,7 @@ import 'package:thermal_printer/thermal_printer.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class PricingScreen extends StatefulWidget {
   const PricingScreen({Key? key}) : super(key: key);
@@ -87,6 +88,10 @@ class _PricingScreenState extends State<PricingScreen> {
           itemName = responseBody["data"]["item_name"];
           itemEquivelentQty = responseBody["data"]["itm_equivelent_qty"];
         });
+
+        _barcodeController.clear();
+        _barcodeFocusNode.requestFocus();
+
       } else {
         clearFiled();
 
@@ -142,6 +147,61 @@ class _PricingScreenState extends State<PricingScreen> {
       address = preferences.getString(ConfigSharedPreferences.address) ?? "";
     });
   }
+
+  String generateCPCLCode(String price) {
+    bool isEnglish = _isStringEnglish(itemName);
+    String itemNameFO = isEnglish ? "^FO200,30" : "^FO470,30"; // Adjust these values as needed
+
+    return """
+    ^XA
+    ^CWZ,E:TT0003M_.FNT^FS
+    ^PW1300
+    ^LL700
+    ^BY2,1,75
+    ^FO150,160^BCN,100,Y,N,N^FD${_barcodeController.text}^FS
+    ^PA1,1,1,1^FS
+    $itemNameFO^CI28^AZN,35,35^TBN,280,280^FD${utf8.decode(utf8.encode(itemName))}^FS
+    ^PA1,1,1,1^FS
+    ${getPriceFieldCode(price)}
+    ^PA1,1,1,1^FS
+    ^FO680,170^CI28^AZN,25,25^TBN,180,230^FD${utf8.decode(utf8.encode(removeTimePortion(normal)))}^FS
+    ^PQ1
+    ^XZ
+  """;
+  }
+
+  String getPriceFieldCode(String price) {
+    double priceValue = double.tryParse(price) ?? 0.0;
+
+    if (priceValue >= 1.0) {
+      List<String> priceParts = priceValue.toStringAsFixed(2).split('.');
+      String beforeComma = priceParts[0];
+      String afterComma = priceParts[1];
+
+      double beforeCommaWidth = (beforeComma.length * 25).toDouble();
+      double afterCommaWidth = (afterComma.length * 25).toDouble();
+
+      int totalWidth = (beforeCommaWidth + afterCommaWidth + 5).toInt();
+
+      return """
+      ^FO${575 - totalWidth ~/ 2},70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode(beforeComma))}^FS
+      ^FO${575 + totalWidth ~/ 2 - afterCommaWidth.toInt()},70^CI28^AZN,35,35^TBN,180,250^FD.${afterComma}^FS
+    """;
+    } else {
+      return "^FO550,70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode(price))}^FS";
+    }
+  }
+
+  bool _isStringEnglish(String text) {
+    RegExp englishPattern = RegExp(r'[A-Za-z]');
+    return englishPattern.hasMatch(text);
+  }
+
+  String removeTimePortion(String input) {
+    RegExp timePattern = RegExp(r'\s00:00:00', unicode: true);
+    return input.replaceAll(timePattern, '');
+  }
+
 
   void presentLoader(BuildContext context,
       {String text = 'الرجاء الأنتظار لحظات...',
@@ -263,7 +323,6 @@ class _PricingScreenState extends State<PricingScreen> {
                       onPressed: () {
                         scanBarcode(context).whenComplete(() async {
                           if (_barcodeController.text.isNotEmpty) {
-                            _pOldItemPriceFocusNode.requestFocus();
                             presentLoader(context,
                                 text: 'الرجاء الأنتظار لحظات...');
                             await getItem().whenComplete(
@@ -578,39 +637,14 @@ class _PricingScreenState extends State<PricingScreen> {
   void validation() {
     if (_barcodeController.text.isNotEmpty) {
       if (priceOffer.isEmpty) {
-        ZebraBluetoothDevice(address, name).sendZplOverBluetooth("^XA" +
-            "^CWZ,E:TT0003M_.FNT^FS" +
-            "^MMT" +
-            "^BY2,1,75" +
-            "^FO150,160^BC^FD${_barcodeController.text}^FS" +
-            "^PA1,1,1,1^FS" +
-            "^FO420,30^CI28^AZN,35,35^TBN,250,250^FD${utf8.decode(utf8.encode('$itemName'))}^FS" +
-            "^PA1,1,1,1^FS" +
-            "^FO550,70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode('$price'))}^FS" +
-            "^PA1,1,1,1^FS" +
-            "^FO660,170^CI28^AZN,25,25^TBN,180,230^FD${utf8.decode(utf8.encode('$normal'))}^FS" +
-            "^PQ1" +
-            "^XZ");
+        ZebraBluetoothDevice(address, name)
+            .sendZplOverBluetooth(generateCPCLCode(price));
         // printTest(address, itemName, price, _barcodeController.text);
       } else {
-        ZebraBluetoothDevice(address, name).sendZplOverBluetooth("^XA" +
-            "^CWZ,E:TT0003M_.FNT^FS" +
-            "^MMT" +
-            "^BY2,2,85" +
-            "^FO180,170^BC^FD${_barcodeController.text}^FS" +
-            "^PA1,1,1,1^FS" +
-            "^FO420,50^CI28^AZN,35,35^TBN,250,250^FD${utf8.decode(utf8.encode('$itemName'))}^FS" +
-            "^PA1,1,1,1^FS" +
-            "^FO550,70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode('$priceOffer'))}^FS" +
-            "^PA1,1,1,1^FS" +
-            "^FO650,170^CI28^AZN,35,35^TBN,180,250^FD${utf8.decode(utf8.encode('$normal'))}^FS" +
-            "^PQ1" +
-            "^XZ");
+        ZebraBluetoothDevice(address, name)
+            .sendZplOverBluetooth(generateCPCLCode(priceOffer));
         // printTest(address, itemName, priceOffer, _barcodeController.text);
       }
-
-      //clear filed
-      clearFiled();
     } else {
       presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
 
@@ -642,7 +676,7 @@ class _PricingScreenState extends State<PricingScreen> {
   }
 
   void clearFiled() {
-    _barcodeController.clear();
+    // _barcodeController.clear();
     _pOldItemPriceController.clear();
 
     _barcodeFocusNode.requestFocus();

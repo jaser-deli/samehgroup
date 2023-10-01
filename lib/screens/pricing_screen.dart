@@ -45,6 +45,7 @@ class _PricingScreenState extends State<PricingScreen> {
   String itemNo = "";
   String itemName = "";
   String itemEquivelentQty = "";
+  String itemBarcode = "";
 
   String priceOffer = "";
   String price = "";
@@ -87,11 +88,11 @@ class _PricingScreenState extends State<PricingScreen> {
           itemNo = responseBody["data"]["item_no"];
           itemName = responseBody["data"]["item_name"];
           itemEquivelentQty = responseBody["data"]["itm_equivelent_qty"];
+          itemBarcode = responseBody["data"]["barcode"];
         });
 
         _barcodeController.clear();
         _barcodeFocusNode.requestFocus();
-
       } else {
         clearFiled();
 
@@ -149,31 +150,39 @@ class _PricingScreenState extends State<PricingScreen> {
   }
 
   String generateCPCLCode(String price) {
-    bool isEnglish = _isStringEnglish(itemName);
-    String itemNameFO = isEnglish ? "^FO200,30" : "^FO470,30"; // Adjust these values as needed
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyy-MM-dd').format(now);
+    NumberFormat formatter = NumberFormat('0.00');
+    bool isEnglish = _isStringEnglish(itemName[0]);
+    String itemNameFO =
+        isEnglish ? "^FO150,60" : "^FO430,60"; // Adjust these values as needed
 
     return """
-    ^XA
-    ^CWZ,E:TT0003M_.FNT^FS
-    ^PW1300
-    ^LL700
-    ^BY2,1,75
-    ^FO150,160^BCN,100,Y,N,N^FD${_barcodeController.text}^FS
-    ^PA1,1,1,1^FS
-    $itemNameFO^CI28^AZN,35,35^TBN,280,280^FD${utf8.decode(utf8.encode(itemName))}^FS
-    ^PA1,1,1,1^FS
-    ${getPriceFieldCode(price)}
-    ^PA1,1,1,1^FS
-    ^FO680,170^CI28^AZN,25,25^TBN,180,230^FD${utf8.decode(utf8.encode(removeTimePortion(normal)))}^FS
-    ^PQ1
-    ^XZ
+      ^XA
+      ^CWZ,E:TT0003M_.FNT^FS
+      ^PW1300
+      ^LL700
+      ^A0N,20,20
+      ^FO190,190^FD$itemBarcode^FS
+      ^A0N,20,20
+      ^FO200,165^FD${utf8.decode(utf8.encode(formattedDate))}^FS
+      ^BY0.5,1,50
+      ^FO170,215^BCN,100,Y,N,N^BCN,100,N,N,N^FD$itemBarcode^FS
+      ^PA1,1,1,1^FS
+      $itemNameFO^CI28^AZN,30,30^TBN,280,280^FD${utf8.decode(utf8.encode(itemName))}^FS
+      ^PA1,1,1,1^FS
+      ${getPriceFieldCode(formatter.format(double.parse(price)))}
+      ^PA1,1,1,1^FS
+      ^FO650,170^CI28^AZN,25,25^TBN,180,230^FD${utf8.decode(utf8.encode(removeTimePortion(normal)))}^FS
+      ^PQ1
+      ^XZ
   """;
   }
 
   String getPriceFieldCode(String price) {
     double priceValue = double.tryParse(price) ?? 0.0;
 
-    if (priceValue >= 1.0) {
+    if (priceValue >= 0.0) {
       List<String> priceParts = priceValue.toStringAsFixed(2).split('.');
       String beforeComma = priceParts[0];
       String afterComma = priceParts[1];
@@ -183,10 +192,17 @@ class _PricingScreenState extends State<PricingScreen> {
 
       int totalWidth = (beforeCommaWidth + afterCommaWidth + 5).toInt();
 
-      return """
-      ^FO${575 - totalWidth ~/ 2},70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode(beforeComma))}^FS
-      ^FO${575 + totalWidth ~/ 2 - afterCommaWidth.toInt()},70^CI28^AZN,35,35^TBN,180,250^FD.${afterComma}^FS
-    """;
+      if (priceValue.toString().length >= 5) {
+        return """
+      ^FO${550 - totalWidth ~/ 2},50^CI28^AZN,70,70^TBN,180,250^FD${utf8.decode(utf8.encode(beforeComma))}^FS
+      ^FO${580 + totalWidth ~/ 2 - afterCommaWidth.toInt()},70^CI28^AZN,40,40^TBN,180,250^FD.$afterComma^FS
+       """;
+      } else {
+        return """
+      ^FO${530 - totalWidth ~/ 2},50^CI28^AZN,90,90^TBN,180,250^FD${utf8.decode(utf8.encode(beforeComma))}^FS
+      ^FO${550 + totalWidth ~/ 2 - afterCommaWidth.toInt()},70^CI28^AZN,60,60^TBN,180,250^FD.${afterComma}^FS
+      """;
+      }
     } else {
       return "^FO550,70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode(price))}^FS";
     }
@@ -201,7 +217,6 @@ class _PricingScreenState extends State<PricingScreen> {
     RegExp timePattern = RegExp(r'\s00:00:00', unicode: true);
     return input.replaceAll(timePattern, '');
   }
-
 
   void presentLoader(BuildContext context,
       {String text = 'الرجاء الأنتظار لحظات...',
@@ -635,22 +650,34 @@ class _PricingScreenState extends State<PricingScreen> {
   }
 
   void validation() {
-    if (_barcodeController.text.isNotEmpty) {
-      if (priceOffer.isEmpty) {
-        ZebraBluetoothDevice(address, name)
-            .sendZplOverBluetooth(generateCPCLCode(price));
-        // printTest(address, itemName, price, _barcodeController.text);
+    if (itemName.isNotEmpty) {
+      if (name[0].toLowerCase() == "x") {
+        if (priceOffer.isEmpty) {
+          ZebraBluetoothDevice(address, name)
+              .sendZplOverBluetooth(generateCPCLCode(price));
+          // printTest(address, itemName, price, _barcodeController.text);
+        } else {
+          ZebraBluetoothDevice(address, name)
+              .sendZplOverBluetooth(generateCPCLCode(priceOffer));
+          // printTest(address, itemName, priceOffer, _barcodeController.text);
+        }
       } else {
-        ZebraBluetoothDevice(address, name)
-            .sendZplOverBluetooth(generateCPCLCode(priceOffer));
-        // printTest(address, itemName, priceOffer, _barcodeController.text);
+        ZebraBluetoothDevice(address, name).printer({
+          "PrinterAdd": address,
+          "ItemName": itemName,
+          "Price": (priceOffer.isNotEmpty) ? priceOffer : price,
+          "Barcode": itemBarcode,
+          "CopyCount": "1"
+        });
       }
-    } else {
-      presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
-
-      validationField(_barcodeController.text, 'p_e_barcode_no',
-          getItem().whenComplete(() => Navigator.of(context).pop()));
     }
+
+    // else {
+    //   presentLoader(context, text: 'الرجاء الأنتظار لحظات...');
+    //
+    //   validationField(_barcodeController.text, 'p_e_barcode_no',
+    //       getItem().whenComplete(() => Navigator.of(context).pop()));
+    // }
   }
 
   void validationField(String text, String alert, Future future) async {

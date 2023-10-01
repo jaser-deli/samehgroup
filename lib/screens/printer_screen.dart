@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutx/flutx.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart' as intl;
 
 class PrintScreen extends StatefulWidget {
   const PrintScreen({Key? key}) : super(key: key);
@@ -75,17 +76,21 @@ class _PrintScreenState extends State<PrintScreen> {
   }
 
   String generateCPCLCode(String price) {
+    intl.NumberFormat formatter = intl.NumberFormat('0.00');
+
     return """
     ^XA
     ^CWZ,E:TT0003M_.FNT^FS
     ^PW1300
     ^LL700
-    ^BY2,1,75
-    ^FO150,160^BCN,100,Y,N,N^FD123456789012^FS
+    ^BY1,1,50
+    ^FO170,160^BCN,100,Y,N,N^BCN,100,N,N,N^FD123456789012^FS
+    ^A0N,20,20
+    ^FO190,265^FD123456789012^FS
     ^PA1,1,1,1^FS
-    ^FO420,50^CI28^AZN,35,35^TBN,250,250^FD${utf8.decode(utf8.encode('بهارت مشكلة'))}^FS
+    ^FO400,30^CI28^AZN,35,35^TBN,250,250^FD${utf8.decode(utf8.encode('بهارت مشكلة'))}^FS
     ^PA1,1,1,1^FS
-    ${getPriceFieldCode(price)}
+      ${getPriceFieldCode(formatter.format(double.parse(price)))}
     ^PA1,1,1,1^FS
     ^FO660,170^CI28^AZN,25,25^TBN,180,230^FD${utf8.decode(utf8.encode('من 2023-04-01 الى 2023-04-15'))}^FS
     ^PQ1
@@ -96,37 +101,37 @@ class _PrintScreenState extends State<PrintScreen> {
   String getPriceFieldCode(String price) {
     double priceValue = double.tryParse(price) ?? 0.0;
 
-    if (priceValue >= 1.0) {
+    if (priceValue >= 0.0) {
       List<String> priceParts = priceValue.toStringAsFixed(2).split('.');
       String beforeComma = priceParts[0];
       String afterComma = priceParts[1];
 
-      double beforeCommaWidth =
-          (beforeComma.length * 25).toDouble(); // Adjust the width as needed
-      double afterCommaWidth =
-          (afterComma.length * 25).toDouble(); // Adjust the width as needed
+      double beforeCommaWidth = (beforeComma.length * 25).toDouble();
+      double afterCommaWidth = (afterComma.length * 25).toDouble();
 
-      int totalWidth = (beforeCommaWidth + afterCommaWidth + 5)
-          .toInt(); // Adjust the spacing as needed
+      int totalWidth = (beforeCommaWidth + afterCommaWidth + 5).toInt();
 
       return """
-      ^FO${575 - totalWidth ~/ 2},70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode(beforeComma))}^FS
-      ^FO${575 + totalWidth ~/ 2 - afterCommaWidth.toInt()},80^CI28^AZN,35,35^TBN,180,250^FD${utf8.decode(utf8.encode('.$afterComma'))}^FS
+      ^FO${530 - totalWidth ~/ 2},35^CI28^AZN,90,90^TBN,180,250^FD${utf8.decode(utf8.encode(beforeComma))}^FS
+      ^FO${550 + totalWidth ~/ 2 - afterCommaWidth.toInt()},55^CI28^AZN,60,60^TBN,180,250^FD.${afterComma}^FS
     """;
     } else {
-      return "^FO550,70^CI28^AZN,35,35^TBN,180,250^FD${utf8.decode(utf8.encode(price))}^FS";
+      return "^FO550,70^CI28^AZN,50,50^TBN,180,250^FD${utf8.decode(utf8.encode(price))}^FS";
     }
   }
 
-  // String zpl = '! U1 setvar "media.type" "label"'
-  //         '! U1 setvar "device.languages" "zpl"' +
-  //     '! U1 setvar "device.pnp_option" "zpl"' +
-  //     '! U1 do "device.reset" "" <CR>';
+  String convertZpl = """
+  ! U1 setvar "device.languages" "zpl"
+  ! U1 setvar "device.pnp_option" "zpl"
+  ! U1 do "device.reset" "" <CR>
+  """;
 
-  String zpl =
-      '! U1 setvar "media.type" "gap"' +
-      '! U1 do "device.save"' +
-      '! U1 do "device.reset" "" <CR>';
+  String configPrint = """
+  ! U1 setvar "media.type" "label"
+  ! U1 setvar "media.sense_mode" "bar"
+  ~jc^xa^jus^xz
+  ! U1 do "device.reset" "" <CR>
+  """;
 
   Future<void> deviceList() async {
     List<ZebraBluetoothDevice> devices = [];
@@ -159,7 +164,7 @@ class _PrintScreenState extends State<PrintScreen> {
     preferences.setString(ConfigSharedPreferences.namePrint, name);
     preferences.setString(ConfigSharedPreferences.address, address);
 
-    getAddressConnection();
+    await getAddressConnection();
   }
 
   Future<void> getAddressConnection() async {
@@ -286,15 +291,13 @@ class _PrintScreenState extends State<PrintScreen> {
                               children: [
                                 InkWell(
                                   onTap: () async {
-                                    ZebraBluetoothDevice(devicesList[index].mac,
-                                            devicesList[index].friendlyName)
-                                        .properties();
+                                    // await ZebraBluetoothDevice(
+                                    //         devicesList[index].mac,
+                                    //         devicesList[index].friendlyName)
+                                    //     .properties();
 
-                                    ZebraBluetoothDevice(devicesList[index].mac,
-                                            devicesList[index].friendlyName)
-                                        .sendZplOverBluetooth(zpl);
-
-                                    addressConnection(
+                                    print(devicesList[index].mac.toString());
+                                    await addressConnection(
                                         devicesList[index]
                                             .friendlyName
                                             .toString(),
@@ -427,19 +430,53 @@ class _PrintScreenState extends State<PrintScreen> {
                           }),
                         ),
               bottomNavigationBar: Container(
-                height: 48,
+                height: 120,
                 margin: paddingHorizontal.add(paddingVerticalMedium),
-                child: FxButton.medium(
-                    borderRadiusAll: 8,
-                    // onPressed: printTest, //printTest,
-                    onPressed: () => ZebraBluetoothDevice(address, name)
-                        .sendZplOverBluetooth(generateCPCLCode("1.50")),
-                    //printTest,
-                    backgroundColor: customTheme.Primary,
-                    child: FxText.labelLarge(
-                      'Print Test'.tr(),
-                      color: customTheme.OnPrimary,
-                    )),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        FxButton.medium(
+                            borderRadiusAll: 8,
+                            // onPressed: printTest, //printTest,
+                            onPressed: () => ZebraBluetoothDevice(address, name)
+                                .sendZplOverBluetooth(convertZpl),
+                            //printTest,
+                            backgroundColor: customTheme.Primary,
+                            child: FxText.labelLarge(
+                              'Convert Zpl'.tr(),
+                              color: customTheme.OnPrimary,
+                            )),
+                        FxButton.medium(
+                            borderRadiusAll: 8,
+                            // onPressed: printTest, //printTest,
+                            onPressed: () => ZebraBluetoothDevice(address, name)
+                                .sendZplOverBluetooth(configPrint),
+                            //printTest,
+                            backgroundColor: customTheme.Primary,
+                            child: FxText.labelLarge(
+                              'Config Printer'.tr(),
+                              color: customTheme.OnPrimary,
+                            )),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    FxButton.medium(
+                        borderRadiusAll: 8,
+                        // onPressed: printTest, //printTest,
+                        onPressed: () => ZebraBluetoothDevice(address, name)
+                            .sendZplOverBluetooth(generateCPCLCode("1.50")),
+                        //printTest,
+                        backgroundColor: customTheme.Primary,
+                        child: FxText.labelLarge(
+                          'Print Test'.tr(),
+                          color: customTheme.OnPrimary,
+                        )),
+                  ],
+                ),
               )),
         ),
       );
